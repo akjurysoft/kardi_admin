@@ -295,11 +295,11 @@ const CarModels = () => {
     }
 
     const handleEditCarBrand = () => {
-        if (!getCarModelNameEdit.edit_car_brand_id) {
+        if (!getCarModelNameEdit.edit_car_brand_id && editData.brand_id === '') {
             openSnackbar('Please select car brand', 'error');
             return
         }
-        if (!getCarModelNameEdit.edit_model_name) {
+        if (!getCarModelNameEdit.edit_model_name && editData.model_name === '') {
             openSnackbar('Please enter model name', 'error');
             return
         }

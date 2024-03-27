@@ -15,27 +15,31 @@ import axios from '../../../axios';
 import { Autocomplete, Checkbox, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { getCarBrands, getCategories, getProductAttributes, getProductBrands, getSubCategories, getSuperSubCategories } from '../api';
 import * as XLSX from 'xlsx';
+import { useRouter } from 'next/navigation';
 
 
 const ProductList = () => {
   const { openSnackbar } = useSnackbar();
+  const router = useRouter()
 
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
       fetchCategory()
-      fetchSubCategory()
-      fetchSuperSubCategory()
-      fetchCarBrand()
+      // fetchCarBrand()
       fetchProductBrand()
     }
 
     return () => { unmounted = true };
   }, [])
 
+ 
+
 
   // ----------------------------------------------Fetch Category section Starts-----------------------------------------------------
   const [categoryData, setCategoryData] = useState([])
+  const [selectedCategory , setSelectedCategory] = useState(null)
+  
   const fetchCategory = async () => {
     try {
       const getAllcategoryData = await getCategories();
@@ -49,27 +53,75 @@ const ProductList = () => {
 
   // ----------------------------------------------Fetch Sub Category section Starts-----------------------------------------------------
   const [subCategoryData, setSubCategoryData] = useState([])
-  const fetchSubCategory = async () => {
-    try {
-      const getSubCatgeoryData = await getSubCategories();
-      setSubCategoryData(getSubCatgeoryData.subcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+  const [selectedSubCategory , setSelectedSubCategory] = useState(null)
+  useEffect(() => {
+    setSelectedSubCategory(null)
+    if (selectedCategory) {
+      fetchSubCategoryData(selectedCategory);
     }
-  };
+  }, [selectedCategory]);
+
+ 
+  const fetchSubCategoryData = useCallback(
+    (selectedCategory) => {
+      axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`,{
+        headers : {
+          Authorization : localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            setSubCategoryData(res.data.subcategories)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
   // ----------------------------------------------Fetch Sub Category section Ends-----------------------------------------------------
 
 
   // ----------------------------------------------Fetch Super Sub Category section Starts-----------------------------------------------------
   const [superSubCategoryData, setSuperSubCategoryData] = useState([])
-  const fetchSuperSubCategory = async () => {
-    try {
-      const getSuperSubCategoryData = await getSuperSubCategories();
-      setSuperSubCategoryData(getSuperSubCategoryData.superSubcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+  const [selectedSuperSubCategory , setSelectedSuperSubCategory] = useState(null)
+  useEffect(() => {
+    setSelectedSuperSubCategory(null)
+    if (selectedSubCategory) {
+      fetchSuperSubCategoryData(selectedSubCategory);
     }
-  };
+  }, [selectedSubCategory]);
+  const fetchSuperSubCategoryData = useCallback(
+    (selectedSubCategory) => {
+      axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`,{
+        headers : {
+          Authorization : localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            setSuperSubCategoryData(res.data.superSubcategories)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
   // ----------------------------------------------Fetch Super Sub Category section Ends-----------------------------------------------------
 
   // ----------------------------------------------Fetch Product Brands section Starts-----------------------------------------------------
@@ -86,45 +138,126 @@ const ProductList = () => {
 
 
   // ----------------------------------------------Fetch Car Brands section Starts-----------------------------------------------------
-  const [carBrandsData, setCarBrandsData] = useState([])
-  const fetchCarBrand = async () => {
-    try {
-      const getCarBrandsData = await getCarBrands();
-      setCarBrandsData(getCarBrandsData.brandName);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
-  // ----------------------------------------------Fetch Car Brands section Ends-----------------------------------------------------
-
-  // ----------------------------------------------Fetch Car Model section Starts-----------------------------------------------------
-  const [carModelsData, setCarModelsData] = useState([])
-
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
-      fetchCarModelsData()
+      fetchBrandData()
     }
 
     return () => { unmounted = true };
   }, [])
 
-  const fetchCarModelsData = useCallback(
+  const [selectedBrand, setSelectedBrand] = useState('');
+  useEffect(() => {
+    if (selectedBrand) {
+      fetchCarModelData(selectedBrand);
+    }
+  }, [selectedBrand]);
+
+  const [brandData, setBrandData] = useState([])
+  const fetchBrandData = useCallback(
     () => {
-      axios.get("/api/fetch-car-models")
+      axios.get(`/api/fetch-car-brands`)
         .then((res) => {
-          if (res.data.status === 'success') {
-            setCarModelsData(res.data.modelName)
+          if (res.data.code == 200) {
+            setBrandData(res.data.brandName)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
           }
         })
-        .then(err => {
+        .catch(err => {
           console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
         })
     },
     [],
   )
 
-  // ----------------------------------------------Fetch Car Model section Ends-----------------------------------------------------
+  const [carModels, setCarModels] = useState([]);
+  const fetchCarModelData = useCallback((brandId) => {
+    axios.get(`/api/fetch-car-models?brand_id=${brandId}`)
+      .then((res) => {
+        if (res.data.code == 200) {
+          setCarModels(res.data.modelName);
+        } else if (res.data.message === 'Session expired') {
+          openSnackbar(res.data.message, 'error');
+          router.push('/login');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        if (err.response && err.response.data.statusCode === 400) {
+          openSnackbar(err.response.data.message, 'error');
+        }
+      });
+  }, []);
+
+  const [selectedModel, setSelectedModel] = useState('');
+  const [carYears, setCarYears] = useState([]);
+  const [startYear, setStartYear] = useState('');
+  const [endYear, setEndYear] = useState('');
+  const fetchCarYears = useCallback((modelId) => {
+    axios.get(`/api/fetch-car-models?id=${modelId}`)
+      .then((res) => {
+        if (res.data.code === 200) {
+          const modelData = res.data.modelName[0];
+          const startYear = parseInt(modelData.start_year);
+          const endYear = parseInt(modelData.end_year);
+          const years = [];
+          for (let year = startYear; year <= endYear; year++) {
+            years.push(year);
+          }
+          setCarYears(years);
+        } else if (res.data.message === 'Session expired') {
+          openSnackbar(res.data.message, 'error');
+          router.push('/login');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        if (err.response && err.response.data.statusCode === 400) {
+          openSnackbar(err.response.data.message, 'error');
+        }
+      });
+  }, []);
+
+  const handleBrandChange = (e) => {
+    const selectedBrandId = e.target.value;
+    setSelectedBrand(selectedBrandId);
+    setCarModels('')
+    setCarYears([])
+  };
+
+
+  const handleModelChange = (e) => {
+    const selectedModelId = e.target.value;
+    setSelectedModel(selectedModelId);
+    fetchCarYears(selectedModelId);
+  };
+
+  useEffect(() => {
+    if (startYear !== '' && endYear !== '' && parseInt(endYear) < parseInt(startYear)) {
+      openSnackbar('End year must be greater than or equal to start year', 'error');
+      setEndYear('');
+    }
+  }, [startYear, endYear]);
+
+  // product brand info section
+  const [showSecondDiv, setShowSecondDiv] = useState(false);
+  const [selectedProductType, setSelectedProductType] = useState('');
+  const handleProductTypeChange = (event) => {
+    const selectedValue = event.target.value;
+    setShowSecondDiv(selectedValue === 'vehicle selection');
+    setSelectedBrand('')
+    setSelectedModel('')
+    setStartYear('')
+    setEndYear('')
+    setSelectedProductType(selectedValue);
+  };
+  // ----------------------------------------------Fetch Car Brands section Ends-----------------------------------------------------
 
   // ----------------------------------------------Fetch Products section Starts-----------------------------------------------------
   const [productData, setProductData] = useState([])
@@ -141,8 +274,8 @@ const ProductList = () => {
 
   const fetchProductData = useCallback(
     () => {
-      axios.get("/api/get-products",{
-        headers:{
+      axios.get("/api/get-products", {
+        headers: {
           Authorization: localStorage.getItem('kardifyAdminToken')
         }
       })
@@ -187,37 +320,6 @@ const ProductList = () => {
     has_warranty: '',
     warranty: ''
   })
-
-  console.log('getProductData',getProductData)
-
-  // product brand info section
-  const [showSecondDiv, setShowSecondDiv] = useState(false);
-  const [selectedProductType, setSelectedProductType] = useState('');
-  const [selectedCarBrand, setSelectedCarBrand] = useState('');
-  const [selectedCarModel, setSelectedCarModel] = useState('');
-
-  const [selectedBrandObject, setSelectedBrandObject] = useState({})
-  const [selectedModelObject, setSelectedModelObject] = useState({})
-  const handleProductTypeChange = (event) => {
-    const selectedValue = event.target.value;
-    setShowSecondDiv(selectedValue === 'vehicle selection');
-    setSelectedProductType(selectedValue);
-  };
-  const handleCarBrandChange = (event) => {
-    const selectedBrand = event.target.value;
-    setSelectedCarBrand(selectedBrand);
-  };
-  useEffect(() => {
-    setSelectedBrandObject(carBrandsData.find((brand) => brand.id == selectedCarBrand));
-  }, [carBrandsData, selectedCarBrand])
-
-  const handleCarModelChange = (event) => {
-    const selectedModel = event.target.value;
-    setSelectedCarModel(selectedModel);
-  };
-  useEffect(() => {
-    setSelectedModelObject(carModelsData.find((brand) => brand.id == selectedCarModel))
-  }, [carModelsData, selectedCarModel])
 
 
   const getData = (e) => {
@@ -269,36 +371,85 @@ const ProductList = () => {
     setUploadedImages(newUploadedImages);
   };
 
-  const handleAddProduct = () => {
 
-    if (selectedProductType === 'Select Product Type') {
+  const reset = () => {
+     setGetProductData({
+       product_name: '',
+       product_desc: '',
+       product_brand_id: '',
+       category_id: '',
+       sub_category_id: '',
+       super_sub_category_id: '',
+       minimum_order: '',
+       default_price: '',
+       stock: '',
+       discount_type: '',
+       discount: '',
+       tax_type: '',
+       tax_rate: '',
+       product_type: '',
+       car_brand_id: '',
+       car_model_id: '',
+       has_exchange_policy: '',
+       exchange_policy: '',
+       has_cancellaton_policy: '',
+       cancellation_policy: '',
+       quantity: '',
+       has_warranty: '',
+       warranty: ''
+     })
+     setSelectedCategory('')
+     setSelectedSubCategory('')
+     setSelectedSuperSubCategory('')
+     setSelectedBrand('')
+     setSelectedModel('')
+     setStartYear('')
+     setEndYear('')
+     setData({});
+     setSelectedProductAttribute([]);
+     setSelectedAttribute([]);
+  }
+
+  const handleAddProduct = () => {
+    if(images.length === 0){
+      openSnackbar('Please add atleast one image', 'error');
+      return
+    }
+    if (selectedProductType === 'Select Product Type' || selectedProductType === '') {
       openSnackbar('Choose Product Type', 'error');
     }
-    else if (selectedProductType === 'vehicle selection' && (!selectedCarBrand || !selectedCarModel)) {
-      openSnackbar('please select both car brand and car model.', 'error');
+    else if (selectedProductType === 'vehicle selection' && (!selectedBrand || !selectedModel || !startYear || !endYear)) {
+      openSnackbar('please select both car brand, car model and year.', 'error');
     } else {
       const formData = new FormData();
-      formData.append('product_name', getProductData.product_name),
-        formData.append('product_desc', getProductData.product_desc),
-        formData.append('product_brand_id', getProductData.product_brand_id),
-        formData.append('category_id', getProductData.category_id),
-        formData.append('sub_category_id', getProductData.sub_category_id),
-        formData.append('super_sub_category_id', getProductData.super_sub_category_id),
-        formData.append('minimum_order', getProductData.minimum_order),
-        formData.append('default_price', getProductData.default_price),
-        formData.append('stock', getProductData.stock),
-        formData.append('product_type', selectedProductType),
-        formData.append('car_brand_id', selectedBrandObject.id),
-        formData.append('car_model_id', selectedModelObject.id),
-        formData.append('discount_type', getProductData.discount_type),
-        formData.append('discount', getProductData.discount),
-        formData.append('tax_type', getProductData.tax_type),
-        formData.append('tax_rate', getProductData.tax_rate),
-        formData.append('quantity', getProductData.quantity),
+      formData.append('product_name', getProductData.product_name)
+        formData.append('product_desc', getProductData.product_desc)
+        formData.append('product_brand_id', getProductData.product_brand_id)
+        formData.append('category_id', selectedCategory)
+        formData.append('sub_category_id', selectedSubCategory)
+        formData.append('super_sub_category_id', selectedSuperSubCategory)
+        formData.append('minimum_order', getProductData.minimum_order)
+        formData.append('default_price', getProductData.default_price)
+        formData.append('stock', getProductData.stock)
+        formData.append('product_type', selectedProductType)
+        
+        
+        formData.append('discount_type', getProductData.discount_type)
+        formData.append('discount', getProductData.discount)
+        formData.append('tax_type', getProductData.tax_type)
+        formData.append('tax_rate', getProductData.tax_rate)
+        formData.append('quantity', getProductData.quantity)
         formData.append('image_count', uploadedImages.length);
 
+        if(selectedBrand && selectedModel && startYear && endYear){
+          formData.append('car_brand_id', selectedBrand)         
+          formData.append('car_model_id', selectedModel)
+          formData.append('start_year', startYear)
+          formData.append('end_year', endYear)
+        };
+
+
       const combinationsDataString = JSON.stringify(addedAttributeData);
-      console.log('combinationsDataString', combinationsDataString)
       formData.append('combinations', combinationsDataString);
 
 
@@ -321,9 +472,7 @@ const ProductList = () => {
             openSnackbar(res.data.message, 'success');
             setIsClickedAddProduct(false)
             fetchProductData()
-            addedAttributeData([])
-            setSelectedBrandObject({})
-            setSelectedModelObject({})
+            reset()
             setUploadedImages([])
           } else {
             openSnackbar(res.data.message, 'error');
@@ -474,10 +623,6 @@ const ProductList = () => {
     setIsEditable(false)
     setEditData({})
     setShowSecondDiv(false)
-    setSelectedCarBrand('')
-    setSelectedCarModel('')
-    setSelectedBrandObject({})
-    setSelectedModelObject({})
     setUploadedImages([])
   }
 
@@ -498,10 +643,6 @@ const ProductList = () => {
   const [selectedProductAttribute, setSelectedProductAttribute] = useState([]);
   const [selectedAttribute, setSelectedAttribute] = useState([])
   const [data, setData] = useState({});
-  console.log('data', data)
-
-  console.log('selectedAttribute', selectedAttribute)
-  console.log('selectedProductAttribute', selectedProductAttribute)
 
   const handleProductChange = (event, value) => {
     setSelectedProductAttribute(value);
@@ -559,13 +700,11 @@ const ProductList = () => {
 
     generate(0, []);
 
-    console.log('combinations', combinations)
     return combinations;
   };
 
   const generateFieldData = (combinations) => {
     return combinations.map((combination) => {
-      console.log('combination', combination)
       const fields = [
         { label: 'price', name: `${combination}_price`, type: 'text' },
         { label: 'stock', name: `${combination}_stock`, type: 'text' }
@@ -608,133 +747,6 @@ const ProductList = () => {
     };
   });
 
-  console.log('addedAttributeData', addedAttributeData);
-  // ---------------------------------2nd way---------------------------------
-
-  // const [getAllProductAttribute, setGetAllProductAttribute] = useState([])
-  // const fetchProductAttribute = async () => {
-  //   try {
-  //     const productAttributeData = await getProductAttributes();
-  //     setGetAllProductAttribute(productAttributeData.attributes);
-  //   } catch (error) {
-  //     console.error('Error fetching products:', error);
-  //   }
-  // };
-
-  // const filteredProducts = getAllProductAttribute.filter(product => product.status === 1);
-
-  // const [selectedAttributes, setSelectedAttributes] = useState([]);
-  // console.log('selectedAttributes', selectedAttributes)
-
-  // const setData = (data) => {
-  //   let attribute_values = []
-  //   for (const iterator of data) {
-  //     let combo = {}
-  //     for (const iterator2 of iterator) {
-  //       combo[Object.keys(iterator2)[0]] = iterator2[Object.keys(iterator2)[0]]
-  //     }
-  //     attribute_values.push({
-  //       ...combo,
-  //       price: null,
-  //       stock: null
-  //     })
-  //   }
-
-  //   setAttributeValues(attribute_values)
-  // }
-
-  // const handleProductChange = (event, newValue) => {
-  //   setSelectedAttributes(newValue);
-  //   generateCombinations(selectedAttributes);
-  // };
-
-  // const [attributeValues, setAttributeValues] = useState([]);
-  // console.log('attributeValues', attributeValues)
-
-  // const inputAttribute = (event, attrIndex) => {
-  //   const inputValue = event.target.value;
-  //   const commaAtEnd = inputValue[inputValue.length - 1];
-
-  //   if (commaAtEnd === ',') {
-  //     const newAttributeValue = inputValue.slice(0, -1);
-  //     const updatedAttributes = [...selectedAttributes];
-  //     if (!updatedAttributes[attrIndex].attributes) {
-  //       updatedAttributes[attrIndex].attributes = [];
-  //     }
-  //     updatedAttributes[attrIndex].attributes.push(newAttributeValue);
-  //     updatedAttributes[attrIndex].attribute = '';
-  //     setSelectedAttributes(updatedAttributes);
-  //     generateCombinations(updatedAttributes);
-  //   } else {
-  //     const updatedAttributes = [...selectedAttributes];
-  //     updatedAttributes[attrIndex].attribute = inputValue;
-  //     setSelectedAttributes(updatedAttributes);
-  //   }
-  // };
-
-  // const removeAttribute = (attributeIndex, dataIndex) => {
-  //   console.log("Removing attribute:", attributeIndex, dataIndex);
-  //   setSelectedAttributes(prevState => {
-  //     const updatedAttributes = [...prevState];
-  //     updatedAttributes[attributeIndex].attributes.splice(dataIndex, 1);
-  //     return updatedAttributes;
-  //   });
-  //   const updatedAttributeValues = attributeValues.map(attrValue => {
-  //     const attributeName = Object.keys(attrValue)[attributeIndex];
-  //     if (attrValue[attributeName] === selectedAttributes[attributeIndex].attributes[dataIndex]) {
-  //       return undefined; // Return undefined to remove this combination
-  //     }
-  //     return attrValue;
-  //   }).filter(Boolean); // Filter out undefined values
-
-  //   setAttributeValues(updatedAttributeValues);
-  // };
-
-  // const handlePriceChange = (event, index) => {
-  //   const newValue = event.target.value;
-  //   setAttributeValues(prevState => {
-  //     const updatedValues = [...prevState];
-  //     updatedValues[index].price = newValue;
-  //     return updatedValues;
-  //   });
-  // };
-
-  // const handleStockChange = (event, index) => {
-  //   const newValue = event.target.value;
-  //   setAttributeValues(prevState => {
-  //     const updatedValues = [...prevState];
-  //     updatedValues[index].stock = newValue;
-  //     return updatedValues;
-  //   });
-  // };
-
-  // const generateCombinations = (attributeObjects) => {
-  //   const result = [];
-
-  //   const generateCombinationsRecursive = (index, currentCombination) => {
-  //     if (index === attributeObjects.length) {
-  //       result.push([...currentCombination]);
-  //       return;
-  //     }
-
-  //     const currentObject = attributeObjects[index];
-
-  //     if (currentObject.attributes && currentObject.attributes.length > 0) {
-  //       for (const attributeValue of currentObject.attributes) {
-  //         currentCombination.push({ [currentObject.attribute_name]: attributeValue });
-  //         generateCombinationsRecursive(index + 1, currentCombination);
-  //         currentCombination.pop();
-  //       }
-  //     } else {
-  //       generateCombinationsRecursive(index + 1, currentCombination);
-  //     }
-  //   };
-
-  //   generateCombinationsRecursive(0, []);
-  //   setData(result);
-  // };
-
-
 
   // ---------------------------Edit Product-------------------------------
   const [editData, setEditData] = useState({})
@@ -744,7 +756,6 @@ const ProductList = () => {
     setIsEditable(true)
   }
 
-  console.log('editData', editData)
 
 
   return (
@@ -857,7 +868,7 @@ const ProductList = () => {
                             <TableCell>{i + 1}</TableCell>
                             <TableCell>{row.car_brand.brand_name || 'N/A'}</TableCell>
                             <TableCell>
-                              <Image src="/images/categoryimage.svg" width={40} height={30} alt='categroy' className='rounded-[8px]' />
+                              <Image src={row.images[0]?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.images[0].image_url}` : '/images/logo.png'} width={70} height={50} alt={row.product_name} className='rounded-[8px]' />
                             </TableCell>
                             <TableCell>{row.product_name}</TableCell>
                             <TableCell>{row.category.category_name}</TableCell>
@@ -952,8 +963,8 @@ const ProductList = () => {
                 <span className='text-[18px] font-[600]'>Category</span>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Main Category</span>
-                  <select className='!text-[14px]' name='category_id' onChange={getData}>
-                    <option>Choose Category</option>
+                  <select className='!text-[14px]' name='category_id' onChange={e => setSelectedCategory(e.target.value)}>
+                    <option value="0">Choose Category</option>
                     {categoryData && categoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.category_name}</option>
                     )}
@@ -961,7 +972,7 @@ const ProductList = () => {
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Sub Category</span>
-                  <select className='!text-[14px]' name='sub_category_id' onChange={getData}>
+                  <select className='!text-[14px]' name='sub_category_id' onChange={e => setSelectedSubCategory(e.target.value)}>
                     <option>Choose Sub Category</option>
                     {subCategoryData && subCategoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.sub_category_name}</option>
@@ -970,7 +981,7 @@ const ProductList = () => {
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Super Sub Category</span>
-                  <select className='!text-[14px]' name='super_sub_category_id' onChange={getData}>
+                  <select className='!text-[14px]' name='super_sub_category_id' onChange={e => setSelectedSuperSubCategory(e.target.value)}>
                     <option>Choose Super Sub Category</option>
                     {superSubCategoryData && superSubCategoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.super_sub_category_name}</option>
@@ -1057,7 +1068,7 @@ const ProductList = () => {
                     <select className='!text-[14px] outline-none focus-none' name='tax_type' onChange={getData}>
                       <option value='0'>Select Tax Type</option>
                       <option value='percent'>Percent</option>
-                      <option value='amount'>Amount</option>
+                      {/* <option value='amount'>Amount</option> */}
                     </select>
                   </div>
                   <div className='flex flex-col space-y-1 w-full'>
@@ -1082,51 +1093,53 @@ const ProductList = () => {
                     <div className='flex items-end gap-[10px]'>
                       <div className='flex flex-col space-y-1 w-full'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Car Brand</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleCarBrandChange}>
-                          <option>Select Brand Here</option>
-                          {carBrandsData && carBrandsData.map((e, i) =>
+                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleBrandChange}>
+                          <option value='0'>Select Brand Here</option>
+                          {brandData && brandData.map((e, i) =>
                             <option key={i} value={e.id}>{e.brand_name}</option>
                           )}
                         </select>
                       </div>
-                      {
+                      {/* {
                         selectedBrandObject?.image_url &&
                         <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${selectedBrandObject?.image_url}`} alt={selectedBrandObject?.brand_name || ''} width={70} height={50} className='rounded-[8px]' />
-                      }
+                      } */}
                     </div>
                     <div className='flex items-end gap-[10px]'>
                       <div className='flex flex-col space-y-1 w-full'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Car Model</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleCarModelChange}>
-                          <option>Select Car Model Here</option>
-                          {carModelsData && carModelsData.filter(e => e.status).map((e, i) =>
+                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleModelChange}>
+                          <option value='0'>Select Car Model Here</option>
+                          {carModels && carModels.filter(e => e.status).map((e, i) =>
                             <option key={i} value={e.id}>{e.model_name}</option>
                           )}
                         </select>
                       </div>
-                      {
+                      {/* {
                         selectedModelObject?.image_url &&
                         <img src={selectedModelObject?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${selectedModelObject?.image_url}` : ''} alt={selectedModelObject?.model_name || ''} width={70} height={50} className='rounded-[8px]' />
-                      }
+                      } */}
                     </div>
-                    {/* <div className='flex items-end gap-[10px]'>
+                    <div className='flex items-end gap-[10px]'>
                       <div className='flex flex-col space-y-1 w-full'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Start Year</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]'>
-                          <option>Select Brand Here</option>
-                          <option>Audi</option>
-                          <option>BMW</option>
+                        <select className='text-[14px]' value={startYear} onChange={(e) => setStartYear(e.target.value)}>
+                          <option value='0'>Choose Start Year</option>
+                          {carYears && carYears.map((e, i) =>
+                            <option key={i} value={e}>{e}</option>
+                          )}
                         </select>
                       </div>
                       <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>Last Year</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]'>
-                          <option>Select Brand Here</option>
-                          <option>Audi</option>
-                          <option>BMW</option>
+                        <span className='text-[14px] text-[#344054] font-[500]'>End Year</span>
+                        <select className='text-[14px]' value={endYear} onChange={(e) => setEndYear(e.target.value)}>
+                          <option value='0'>Choose End Year</option>
+                          {carYears && carYears.map((e, i) =>
+                            <option key={i} value={e}>{e}</option>
+                          )}
                         </select>
                       </div>
-                    </div> */}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1136,10 +1149,10 @@ const ProductList = () => {
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
                   <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' placeholder='Add description' />
                 </div>
-                <div className='flex items-center gap-[20px] justify-between'>
+                {/* <div className='flex items-center gap-[20px] justify-between'>
                   <span className='px-[18px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
                   <span className='px-[18px] py-[10px] rounded-[8px] text-[#fff] w-full text-center text-[16px] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer'>Yes, there is</span>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -1150,15 +1163,15 @@ const ProductList = () => {
                   <span className='text-[14px] text-[#344054] font-[500]'>Net Quantity</span>
                   <input type='text' className='outline-none focus-none inputText !text-[14px]' placeholder='06' name='quantity' onChange={getData} />
                 </div>
-                <div className='flex items-end gap-[10px]'>
                   <div className='flex flex-col space-y-1'>
                     <span className='text-[14px] text-[#344054] font-[500]'>Warranty</span>
                     <input type='text' className='outline-none focus-none inputText !text-[14px]' placeholder='06' />
                   </div>
-                  <div className='flex items-center gap-[20px] justify-between w-full'>
+                <div className='flex items-end gap-[10px]'>
+                  {/* <div className='flex items-center gap-[20px] justify-between w-full'>
                     <span className='px-[10px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
                     <span className='px-[10px] py-[10px] rounded-[8px] text-[#fff] w-full text-center text-[16px] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer'>Yes, there is</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className='flex flex-col space-y-3 border border-[#D0D5DD] rounded-[16px] p-[16px] w-[100%]'>
@@ -1167,10 +1180,10 @@ const ProductList = () => {
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
                   <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' placeholder='Add description' />
                 </div>
-                <div className='flex items-center gap-[20px] justify-between'>
+                {/* <div className='flex items-center gap-[20px] justify-between'>
                   <span className='px-[18px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
                   <span className='px-[18px] py-[10px] rounded-[8px] text-[#fff] w-full text-center text-[16px] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer'>Yes, there is</span>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -1333,7 +1346,7 @@ const ProductList = () => {
 
 
             <div className='flex items-center gap-[30px] justify-end'>
-              <span className='px-[38px] py-[10px] rounded-[8px] border border-[#D0D5DD] text-[16px] text-[#344054] font-[600] cursor-pointer' onClick={handleBack}>Reset</span>
+              <span className='px-[38px] py-[10px] rounded-[8px] border border-[#D0D5DD] text-[16px] text-[#344054] font-[600] cursor-pointer' onClick={handleBack}>Back</span>
               <span className='px-[38px] py-[10px] rounded-[8px] text-[16px] text-[#fff] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer' onClick={handleAddProduct}>Submit</span>
             </div>
           </>
@@ -1374,7 +1387,7 @@ const ProductList = () => {
                 <span className='text-[18px] font-[600]'>Category</span>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Main Category</span>
-                  <select className='!text-[14px]' name='category_id'  defaultValue={editData.category_id} onChange={getData}>
+                  <select className='!text-[14px]' name='category_id' defaultValue={editData.category_id} onChange={getData}>
                     <option>Choose Category</option>
                     {categoryData && categoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.category_name}</option>
@@ -1478,7 +1491,7 @@ const ProductList = () => {
                     <select className='!text-[14px] outline-none focus-none' name='tax_type' onChange={getData}>
                       <option value='0'>Select Tax Type</option>
                       <option value='percent'>Percent</option>
-                      <option value='amount'>Amount</option>
+                      {/* <option value='amount'>Amount</option> */}
                     </select>
                   </div>
                   <div className='flex flex-col space-y-1 w-full'>
@@ -1501,7 +1514,7 @@ const ProductList = () => {
                   </select>
                   <div className={`flex flex-col space-y-1 w-full ${showSecondDiv ? '' : 'hidden'}`}>
                     <div className='flex items-end gap-[10px]'>
-                      <div className='flex flex-col space-y-1 w-full'>
+                      {/* <div className='flex flex-col space-y-1 w-full'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Car Brand</span>
                         <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleCarBrandChange}>
                           <option>Select Brand Here</option>
@@ -1509,45 +1522,27 @@ const ProductList = () => {
                             <option key={i} value={e.id}>{e.brand_name}</option>
                           )}
                         </select>
-                      </div>
-                      {
+                      </div> */}
+                      {/* {
                         selectedBrandObject?.image_url &&
                         <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${selectedBrandObject?.image_url}`} alt={selectedBrandObject?.brand_name || ''} width={70} height={50} className='rounded-[8px]' />
-                      }
-                    </div>
-                    <div className='flex items-end gap-[10px]'>
+                      } */}
+                    {/* </div> */}
+                    {/* <div className='flex items-end gap-[10px]'>
                       <div className='flex flex-col space-y-1 w-full'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Car Model</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleCarModelChange}>
+                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={ha}>
                           <option>Select Car Model Here</option>
                           {carModelsData && carModelsData.filter(e => e.status).map((e, i) =>
                             <option key={i} value={e.id}>{e.model_name}</option>
                           )}
                         </select>
-                      </div>
-                      {
+                      </div> */}
+                      {/* {
                         selectedModelObject?.image_url &&
                         <img src={selectedModelObject?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${selectedModelObject?.image_url}` : ''} alt={selectedModelObject?.model_name || ''} width={70} height={50} className='rounded-[8px]' />
-                      }
+                      } */}
                     </div>
-                    {/* <div className='flex items-end gap-[10px]'>
-                      <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>Start Year</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]'>
-                          <option>Select Brand Here</option>
-                          <option>Audi</option>
-                          <option>BMW</option>
-                        </select>
-                      </div>
-                      <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>Last Year</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]'>
-                          <option>Select Brand Here</option>
-                          <option>Audi</option>
-                          <option>BMW</option>
-                        </select>
-                      </div>
-                    </div> */}
                   </div>
                 </div>
               </div>
@@ -1557,10 +1552,10 @@ const ProductList = () => {
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
                   <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' placeholder='Add description' />
                 </div>
-                <div className='flex items-center gap-[20px] justify-between'>
+                {/* <div className='flex items-center gap-[20px] justify-between'>
                   <span className='px-[18px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
                   <span className='px-[18px] py-[10px] rounded-[8px] text-[#fff] w-full text-center text-[16px] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer'>Yes, there is</span>
-                </div>
+                </div> */}
               </div>
             </div>
 

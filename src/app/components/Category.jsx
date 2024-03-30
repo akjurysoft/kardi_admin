@@ -151,13 +151,15 @@ const Category = () => {
 
 
   const handleAddCategory = () => {
-    if (!image) {
-      openSnackbar('Please Select Image', 'error');
-      return;
-    }
+    // if (!image) {
+    //   openSnackbar('Please Select Image', 'error');
+    //   return;
+    // }
     const formData = new FormData();
     formData.append('category_name', getCategoryName.category_name);
-    formData.append('image', image);
+    if(image){
+      formData.append('image', image);
+    }
 
     axios.post('/api/add-categories', formData, {
       headers: {

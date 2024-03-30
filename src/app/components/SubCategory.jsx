@@ -169,14 +169,16 @@ const SubCategory = () => {
   };
 
   const handleAddSubCategory = () => {
-    if (!image) {
-      openSnackbar('Please Select Image', 'error');
-      return;
-    }
+    // if (!image) {
+    //   openSnackbar('Please Select Image', 'error');
+    //   return;
+    // }
     const formData = new FormData();
     formData.append('sub_category_name', getSubCategoryName.sub_category_name);
     formData.append('category_id', getSubCategoryName.category_id);
-    formData.append('image', image);
+    if(image){
+      formData.append('image', image);
+    }
 
     axios.post('/api/add-subcategories', formData, {
       headers: {

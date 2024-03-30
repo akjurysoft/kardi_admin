@@ -202,7 +202,10 @@ const SuperSubCategory = () => {
     formData.append('sub_category_id', getSuperSubCategoryName.sub_category_id);
     formData.append('category_id', getSuperSubCategoryName.category_id);
     formData.append('super_sub_category_name', getSuperSubCategoryName.super_sub_category_name)
-    formData.append('image', image);
+    if (image) {
+      formData.append('image', image);
+    }
+    // formData.append('image', image);
 
     axios.post('/api/add-supersubcategory', formData, {
       headers: {

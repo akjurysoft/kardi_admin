@@ -282,6 +282,9 @@ const ProductList = () => {
         .then((res) => {
           if (res.data.status === 'success') {
             setProductData(res.data.products)
+          }else if(res.data.message === 'Session expired'){
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
           }
         })
         .then(err => {
@@ -426,8 +429,12 @@ const ProductList = () => {
         formData.append('product_desc', getProductData.product_desc)
         formData.append('product_brand_id', getProductData.product_brand_id)
         formData.append('category_id', selectedCategory)
-        formData.append('sub_category_id', selectedSubCategory)
-        formData.append('super_sub_category_id', selectedSuperSubCategory)
+        if(selectedSubCategory){
+          formData.append('sub_category_id', selectedSubCategory)
+        }
+        if(selectedSuperSubCategory){
+          formData.append('super_sub_category_id', selectedSuperSubCategory)
+        }
         formData.append('minimum_order', getProductData.minimum_order)
         formData.append('default_price', getProductData.default_price)
         formData.append('stock', getProductData.stock)
@@ -526,9 +533,13 @@ const ProductList = () => {
   const filteredRows = productData.filter((e) =>
     e.product_name.toLowerCase().includes(searchQuery.toLowerCase()) &&
     e.category.category_name.toLowerCase().includes(searchQueryCategory.toLowerCase()) &&
-    e.sub_category.sub_category_name?.toLowerCase().includes(searchQuerySubCategory.toLowerCase()) &&
-    e.super_sub_category.super_sub_category_name?.toLowerCase().includes(searchQuerySuperSubCategory.toLowerCase())
-  );
+    (!searchQuerySubCategory || (e.sub_category && e.sub_category.sub_category_name?.toLowerCase().includes(searchQuerySubCategory.toLowerCase()))) &&
+    (!searchQuerySuperSubCategory || (e.super_sub_category && e.super_sub_category.super_sub_category_name?.toLowerCase().includes(searchQuerySuperSubCategory.toLowerCase())))
+);
+
+const startIndex = (page - 1) * rowsPerPage;
+const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
   const handleExportToExcel = () => {
     Swal.fire({
@@ -555,7 +566,7 @@ const ProductList = () => {
     });
   };
 
-  const paginatedRows = filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  
 
   // ----------------------------------------------Change status section Starts-----------------------------------------------------
   const handleSwitchChange = (id) => {
@@ -865,7 +876,7 @@ const ProductList = () => {
                       <TableBody>
                         {paginatedRows.map((row, i) => (
                           <TableRow key={i} >
-                            <TableCell>{i + 1}</TableCell>
+                            <TableCell>{startIndex + i + 1}</TableCell>
                             <TableCell>{row.car_brand.brand_name || 'N/A'}</TableCell>
                             <TableCell>
                               <Image src={row.images[0]?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.images[0].image_url}` : '/images/logo.png'} width={70} height={50} alt={row.product_name} className='rounded-[8px]' />

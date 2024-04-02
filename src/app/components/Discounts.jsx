@@ -13,6 +13,7 @@ import { Autocomplete, Checkbox, FormControl, InputLabel, MenuItem, Select } fro
 import { useSnackbar } from '../SnackbarProvider';
 import { IoClose } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2'
 
 const Discounts = () => {
   const { openSnackbar } = useSnackbar();
@@ -210,8 +211,8 @@ const Discounts = () => {
     e.discount_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const startIndex = (page - 1) * rowsPerPage;
-const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
-const paginatedRows = filteredRows.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+  const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
 
   // -------------------multiple product choose------------------------
@@ -370,8 +371,65 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
   }
   //--------------------------add discounts section ends--------------------------------
 
+  // -------------------------- status change section starts--------------------------------
+
+  const handleSwitchChange = (id) => {
+    axios.post(`/api/update-discount-status?discount_id=${id}`, {}, {
+      headers: {
+        Authorization: localStorage.getItem('kardifyAdminToken')
+      }
+    })
+      .then(res => {
+        if (res.data.status === 'success') {
+          openSnackbar(res.data.message, 'success');
+          fetchDiscountsData()
+        }else{
+          openSnackbar(res.data.message, 'error');
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  };
+  // -------------------------- status change section ends--------------------------------
 
 
+  // --------------------------delete discounts section starts--------------------------------
+  const deleteDiscount = (data) => {
+    Swal.fire({
+      title: "Delete",
+      text: `Do you want to Delete this ${data.discount_name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#CFAA4C",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "No",
+      confirmButtonText: "Yes! Delete it"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post(`/api/delete-discount?discount_id=${data.id}`, {}, {
+          headers: {
+            Authorization: localStorage.getItem('kardifyAdminToken')
+          }
+        })
+          .then(res => {
+            if (res.data.status === 'success') {
+              openSnackbar(res.data.message, 'success');
+              fetchDiscountsData()
+            }else{
+              openSnackbar(res.data.message, 'error');
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
+    })
+  };
+  // --------------------------delete discounts section ends--------------------------------
+
+
+  // --------------------------edit discounts section starts--------------------------------
   const [isEditable, setIsEditable] = useState(false)
   const [editData, setEditData] = useState({})
 
@@ -525,8 +583,8 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
           <div className='flex flex-col space-y-5  border border-[#EAECF0] rounded-[8px] p-[10px]'>
             <div className='flex items-center px-3 justify-between'>
               <div className='flex space-x-2 items-center'>
-                <span className='text-[18px] font-[500] text-[#101828]'>Discounts</span>
-                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{discountData.length} Discounts</span>
+                <span className='text-[18px] font-[500] text-[#101828]'>Offers</span>
+                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{discountData.length} Offers</span>
               </div>
               <div className='flex items-center space-x-3 inputText w-[50%]'>
                 <IoSearch className='text-[20px]' />
@@ -564,7 +622,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                   </TableHead>
                   {filteredRows.length > 0 ?
                     <TableBody>
-                      {paginatedRows.map((row , i) => (
+                      {paginatedRows.map((row, i) => (
                         <TableRow key={row.id} >
                           <TableCell>{startIndex + i + 1}</TableCell>
                           <TableCell>
@@ -622,7 +680,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                               }}
                             />
                           </TableCell>
-                          <TableCell ><FaRegTrashAlt className='cursor-pointer' onClick={() => deleteCategory(row)} /></TableCell>
+                          <TableCell ><FaRegTrashAlt className='cursor-pointer' onClick={() => deleteDiscount(row)} /></TableCell>
                           <TableCell><FaEdit className='cursor-pointer' onClick={() => handleEdit(row)} /></TableCell>
                         </TableRow>
                       ))}

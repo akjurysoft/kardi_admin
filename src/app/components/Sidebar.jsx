@@ -179,7 +179,7 @@ const Sidebar = () => {
                         <li className={`leftMenuHover p-[10px] rounded-[8px] cursor-pointer ${activeComponent === 'discount' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('discount')}>
                             <div className='flex items-center gap-[10px]'>
                                 <Image src={banner} height={20} width={20} />
-                                Discounts
+                                Offers
                             </div>
                         </li>
                     </div>

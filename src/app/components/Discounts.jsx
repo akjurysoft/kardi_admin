@@ -11,16 +11,17 @@ import axios from '../../../axios';
 import { getCategories, getProductBrands, getProducts, getSubCategories, getSuperSubCategories } from '../api';
 import { Autocomplete, Checkbox, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { useSnackbar } from '../SnackbarProvider';
+import { IoClose } from "react-icons/io5";
+import { useRouter } from 'next/navigation';
 
 const Discounts = () => {
   const { openSnackbar } = useSnackbar();
+  const router = useRouter()
 
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
       fetchCategory()
-      fetchSubCategory()
-      fetchSuperSubCategory()
       fetchProductBrands()
       fetchProducts()
       fetchDiscountsData()
@@ -30,6 +31,7 @@ const Discounts = () => {
   }, [])
 
   const [getAllCategories, setGetAllCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null)
   const fetchCategory = async () => {
     try {
       const categoryData = await getCategories();
@@ -39,45 +41,134 @@ const Discounts = () => {
     }
   };
 
-  const [getAllSubCategories, setGetAllSubCategories] = useState([])
-  const fetchSubCategory = async () => {
-    try {
-      const subCatgeoryData = await getSubCategories();
-      setGetAllSubCategories(subCatgeoryData.subcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
 
-  const [getAllSuperSubCategories, setGetAllSuperSubCategories] = useState([])
-  const fetchSuperSubCategory = async () => {
-    try {
-      const superSubCategoryData = await getSuperSubCategories();
-      setGetAllSuperSubCategories(superSubCategoryData.superSubcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+  // ------------------------ Sub Category Data ----------------------------
+  const [subCategoryData, setSubCategoryData] = useState([])
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null)
+  useEffect(() => {
+    setSelectedSubCategory(null)
+    if (selectedCategory) {
+      fetchSubCategoryData(selectedCategory);
     }
-  };
+  }, [selectedCategory]);
 
+
+  const fetchSubCategoryData = useCallback(
+    (selectedCategory) => {
+      axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`, {
+        headers: {
+          Authorization: localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            setSubCategoryData(res.data.subcategories)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
+
+  // ----------------------------------------------Fetch Super Sub Category section Starts-----------------------------------------------------
+  const [superSubCategoryData, setSuperSubCategoryData] = useState([])
+  const [selectedSuperSubCategory, setSelectedSuperSubCategory] = useState(null)
+  useEffect(() => {
+    setSelectedSuperSubCategory(null)
+    if (selectedSubCategory) {
+      fetchSuperSubCategoryData(selectedSubCategory);
+    }
+  }, [selectedSubCategory]);
+
+  const fetchSuperSubCategoryData = useCallback(
+    (selectedSubCategory) => {
+      axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`, {
+        headers: {
+          Authorization: localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            setSuperSubCategoryData(res.data.superSubcategories)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
+  // ----------------------------------------------Fetch Super Sub Category section Ends-----------------------------------------------------
   const [getAllProductBrands, setGetAllProductBrands] = useState([])
+  const [selectedProductBrand, setSelectedProductBrand] = useState(null)
   const fetchProductBrands = async () => {
     try {
       const productBrandData = await getProductBrands();
-      setGetAllProductBrands(productBrandData.brandName);
+      setGetAllProductBrands(productBrandData.brandNames);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
   };
 
   const [getAllProducts, setGetAllProducts1] = useState([])
-  const fetchProducts = async () => {
-    try {
-      const productsData = await getProducts();
-      setGetAllProducts1(productsData.products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
+  useEffect(() => {
+    fetchProducts(selectedProductBrand, selectedCategory, selectedSubCategory, selectedSuperSubCategory);
+  }, [selectedProductBrand, selectedCategory, selectedSubCategory, selectedSuperSubCategory]);
+
+  const fetchProducts = useCallback(
+    (brand, category, subcategory, superSubcategory) => {
+      let queryParams = '';
+
+      if (brand) {
+        queryParams += `product_brand_id=${brand}&`;
+      }
+      if (category) {
+        queryParams += `category_id=${category}&`;
+      }
+      if (subcategory) {
+        queryParams += `sub_category_id=${subcategory}&`;
+      }
+      if (superSubcategory) {
+        queryParams += `super_sub_category_id=${superSubcategory}&`;
+      }
+
+      axios.get(`/api/get-products?${queryParams}`, {
+        headers: {
+          Authorization: localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            console.log(res.data.products)
+            setGetAllProducts1(res.data.products)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
 
   const filteredProducts = getAllProducts.filter(product => product.status === 1);
 
@@ -85,7 +176,11 @@ const Discounts = () => {
   const [discountData, setDiscountData] = useState([])
   const fetchDiscountsData = useCallback(
     () => {
-      axios.get('/api/get-all-discounts-admin')
+      axios.get('/api/get-all-discounts-admin', {
+        headers: {
+          Authorization: localStorage.getItem('kardifyAdminToken')
+        }
+      })
         .then((res) => {
           if (res.data.status === 'success') {
             setDiscountData(res.data.discounts)
@@ -114,7 +209,9 @@ const Discounts = () => {
   const filteredRows = discountData.filter((e) =>
     e.discount_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const paginatedRows = filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const startIndex = (page - 1) * rowsPerPage;
+const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
 
   // -------------------multiple product choose------------------------
@@ -177,32 +274,91 @@ const Discounts = () => {
     document.getElementById('category_id').value = ''
     document.getElementById('sub_category_id').value = ''
     document.getElementById('super_sub_category_id').value = ''
-    document.getElementById('products').value = ''
     document.getElementById('discount').value = ''
     document.getElementById('min_amount').value = ''
     document.getElementById('max_amount').value = ''
     document.getElementById('start_date').value = ''
     document.getElementById('expiry_date').value = ''
+    setImage(null);
+    setShowImage(null)
+    document.getElementById('image').value = ''
   }
 
+  // Image uploading section
+  const [image, setImage] = useState(null);
+  const [showImage, setShowImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImage(file);
+        setShowImage(e.target.result)
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setShowImage(null)
+    document.getElementById('image').value = ''
+  };
+
+
   const addDiscount = () => {
-    axios.post('/api/add-discounts', {
-      discount_name: discountDataInput.discount_name,
-      product_brand_id: discountDataInput.product_brand_id,
-      category_id: discountDataInput.category_id,
-      sub_category_id: discountDataInput.sub_category_id,
-      super_sub_category_id: discountDataInput.super_sub_category_id,
-      products: discountDataInput.products,
-      discount_type: discountDataInput.discount_type,
-      discount: discountDataInput.discount,
-      min_amount: discountDataInput.min_amount,
-      max_amount: discountDataInput.max_amount,
-      start_date: discountDataInput.start_date,
-      expiry_date: discountDataInput.expiry_date
+    if (!discountDataInput.discount_name) {
+      openSnackbar('Please Enter Discount Name', 'error');
+      return
+    }
+    if (!image) {
+      openSnackbar('Please Select Image', 'error');
+      return
+    }
+
+    const formdata = new FormData()
+    if (selectedProductBrand) {
+      formdata.append('product_brand_id', selectedProductBrand)
+    }
+
+    if (selectedCategory) {
+      formdata.append('category_id', selectedCategory)
+    }
+
+    if (selectedSubCategory) {
+      formdata.append('sub_category_id', selectedSubCategory)
+    }
+
+    if (selectedSuperSubCategory) {
+      formdata.append('super_sub_category_id', selectedSuperSubCategory)
+    }
+
+    if (selectedProducts.length > 0) {
+      formdata.append('products', JSON.stringify(discountDataInput.products));
+    }
+
+    if (image) {
+      formdata.append('image', image)
+    }
+    formdata.append('discount_name', discountDataInput.discount_name)
+    formdata.append('discount_type', discountDataInput.discount_type)
+    formdata.append('discount', discountDataInput.discount)
+    formdata.append('min_amount', discountDataInput.min_amount)
+    formdata.append('max_amount', discountDataInput.max_amount)
+    formdata.append('start_date', discountDataInput.start_date)
+    formdata.append('expiry_date', discountDataInput.expiry_date)
+
+
+    axios.post('/api/add-discounts', formdata, {
+      headers: {
+        Authorization: localStorage.getItem('kardifyAdminToken'),
+        'Content-Type': 'multipart/form-data',
+      }
     })
       .then(res => {
         console.log(res)
-        if (res.data.status === 'success'){
+        if (res.data.status === 'success') {
           openSnackbar(res.data.message, 'success');
           fetchDiscountsData()
           reset()
@@ -214,7 +370,7 @@ const Discounts = () => {
   }
   //--------------------------add discounts section ends--------------------------------
 
- 
+
 
   const [isEditable, setIsEditable] = useState(false)
   const [editData, setEditData] = useState({})
@@ -238,20 +394,20 @@ const Discounts = () => {
       {!isEditable ?
         <div className=' py-[10px] flex flex-col space-y-5'>
           <div className='flex flex-col space-y-1'>
-            <span className='text-[30px] text-[#101828] font-[500]'>Discounts Setup</span>
+            <span className='text-[30px] text-[#101828] font-[500]'>Offers Setup</span>
             <span className='text-[#667085] font-[400] text-[16px]'>Effortless Discount Management for Admin Efficiency.</span>
           </div>
 
           <div className='grid grid-cols-3 gap-4 gap-[10px]'>
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Name </span>
+              <span>Offer Name </span>
               <input type='text' placeholder='Discount title' id='discount_name' className='inputText' name='discount_name' value={discountData.discount_name}
                 onChange={handleInputChange} />
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Product Brands </span>
-              <select name='product_brand_id' id='product_brand_id' onChange={handleInputChange} value={discountData.product_brand_id}>
-                <option>Select Product brand Here</option>
+              <select name='product_brand_id' id='product_brand_id' onChange={e => setSelectedProductBrand(e.target.value)}>
+                <option value=''>Select Product brand Here</option>
                 {getAllProductBrands && getAllProductBrands.filter(e => e.status).map((e, i) =>
                   <option key={i} value={e.id}>{e.brand_name}</option>
                 )}
@@ -259,8 +415,8 @@ const Discounts = () => {
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Category </span>
-              <select name='category_id' id='category_id' onChange={handleInputChange} value={discountData.category_id}>
-                <option>Select category  Here</option>
+              <select name='category_id' id='category_id' onChange={e => setSelectedCategory(e.target.value)}>
+                <option value=''>Select category  Here</option>
                 {getAllCategories && getAllCategories.filter(e => e.status).map((e, i) =>
                   <option key={i} value={e.id}>{e.category_name}</option>
                 )}
@@ -268,18 +424,18 @@ const Discounts = () => {
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Sub Category </span>
-              <select name='sub_category_id' id='sub_category_id' onChange={handleInputChange} value={discountData.sub_category_id}>
-                <option>Select Sub category Type Here</option>
-                {getAllSubCategories && getAllSubCategories.filter(e => e.status).map((e, i) =>
+              <select name='sub_category_id' id='sub_category_id' onChange={e => setSelectedSubCategory(e.target.value)}>
+                <option value=''>Select Sub category Type Here</option>
+                {subCategoryData && subCategoryData.filter(e => e.status).map((e, i) =>
                   <option key={i} value={e.id}>{e.sub_category_name}</option>
                 )}
               </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Super Sub Category </span>
-              <select name='super_sub_category_id' id='super_sub_category_id' onChange={handleInputChange} value={discountData.super_sub_category_id}>
-                <option>Select Super sub category Here</option>
-                {getAllSuperSubCategories && getAllSuperSubCategories.filter(e => e.status).map((e, i) =>
+              <select name='super_sub_category_id' id='super_sub_category_id' onChange={e => setSelectedSuperSubCategory(e.target.value)}>
+                <option value=''>Select Super sub category Here</option>
+                {superSubCategoryData && superSubCategoryData.filter(e => e.status).map((e, i) =>
                   <option key={i} value={e.id}>{e.super_sub_category_name}</option>
                 )}
               </select>
@@ -342,10 +498,26 @@ const Discounts = () => {
               <span>Expiry Date </span>
               <input type='Date' placeholder='Horn' className='inputText' id='expiry_date' name='expiry_date' onChange={handleInputChange} value={discountData.expiry_date} />
             </div>
+
+          </div>
+          <div className='flex items-end gap-[10px]'>
+            <div className='flex flex-col space-y-1 '>
+              <span>Offer Image</span>
+              <input type='file' accept='image/*' id='image' onChange={handleImageChange} />
+            </div>
+
+            {showImage && (
+              <div className="relative bg-[#D8C7B6] rounded-[8px]">
+                <img src={showImage} alt='Uploaded Preview' width={100} className='rounded-[8px] h-[60px] !w-[60px]' />
+                <span onClick={handleRemoveImage} className="absolute top-[-15px] right-0 bg-transparent text-black cursor-pointer">
+                  <IoClose />
+                </span>
+              </div>
+            )}
           </div>
 
           <div className='flex items-center gap-[24px] justify-end'>
-            <span className='resetButton'>Reset</span>
+            <span className='resetButton' onClick={reset}>Reset</span>
             <span className='submitButton' onClick={addDiscount}>Submit</span>
           </div>
 
@@ -376,7 +548,8 @@ const Discounts = () => {
                     <TableRow className='!bg-[#F9FAFB]'>
                       {/* Define your table header columns */}
                       <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
-                      <TableCell style={{ minWidth: 150 }}>Title</TableCell>
+                      <TableCell style={{ minWidth: 200 }}>Title</TableCell>
+                      <TableCell style={{ minWidth: 150 }}>Offer Image</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Product Brand</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Category Name</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Discount Type</TableCell>
@@ -391,17 +564,20 @@ const Discounts = () => {
                   </TableHead>
                   {filteredRows.length > 0 ?
                     <TableBody>
-                      {paginatedRows.map((row) => (
+                      {paginatedRows.map((row , i) => (
                         <TableRow key={row.id} >
-                          <TableCell>{row.id}</TableCell>
+                          <TableCell>{startIndex + i + 1}</TableCell>
                           <TableCell>
                             {row.discount_name}
                           </TableCell>
                           <TableCell>
-                            {row.product_brand_id}
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image}`} width={50} height={50} alt={row.category?.category_name} className='rounded-[8px]' />
                           </TableCell>
                           <TableCell>
-                            {row.category_id}
+                            {row.product_brand?.brand_name || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {row.category?.category_name || 'N/A'}
                           </TableCell>
                           <TableCell>
                             {row.discount_type}
@@ -453,7 +629,7 @@ const Discounts = () => {
                     </TableBody>
                     :
                     <TableRow>
-                      <TableCell colSpan={7} className='text-center text-[15px] font-bold'>No product found</TableCell>
+                      <TableCell colSpan={7} className='text-center text-[15px] font-bold'>No Discounts found</TableCell>
                     </TableRow>
                   }
                 </Table>

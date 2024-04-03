@@ -48,6 +48,7 @@ const Discounts = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState(null)
   useEffect(() => {
     setSelectedSubCategory(null)
+    document.getElementById('sub_category_id').value = ''
     if (selectedCategory) {
       fetchSubCategoryData(selectedCategory);
     }
@@ -84,6 +85,7 @@ const Discounts = () => {
   const [selectedSuperSubCategory, setSelectedSuperSubCategory] = useState(null)
   useEffect(() => {
     setSelectedSuperSubCategory(null)
+    document.getElementById('super_sub_category_id').value = ''
     if (selectedSubCategory) {
       fetchSuperSubCategoryData(selectedSubCategory);
     }

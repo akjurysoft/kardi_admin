@@ -429,7 +429,7 @@ const Installer = () => {
                             <TableHead>
                                 <TableRow className='!bg-[#F9FAFB]'>
                                     {/* Define your table header columns */}
-                                    <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                    <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                     <TableCell style={{ minWidth: 150 }}>Installer ID</TableCell>
                                     <TableCell style={{ minWidth: 200 }}>Installer Name</TableCell>
                                     <TableCell style={{ minWidth: 150 }}>Installer info</TableCell>

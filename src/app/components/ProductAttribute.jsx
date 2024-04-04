@@ -157,7 +157,9 @@ const ProductAttribute = () => {
   const filteredRows = attributeData.filter((e) =>
     e.attribute_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const paginatedRows = filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+  const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
 
   // ----------------------------------------------Delete Attribute section Starts-----------------------------------------------------
@@ -260,8 +262,8 @@ const ProductAttribute = () => {
           <div className='flex flex-col space-y-5  border border-[#EAECF0] rounded-[8px] p-[10px]'>
             <div className='flex items-center px-3 justify-between'>
               <div className='flex space-x-2 items-center'>
-                <span className='text-[18px] font-[500] text-[#101828]'>Product Attibute</span>
-                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{attributeData.length} Attribute</span>
+                <span className='text-[18px] font-[500] text-[#101828]'>Product Attribute Name</span>
+                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{attributeData.length} Attributes</span>
               </div>
               <div className='flex items-center space-x-3 inputText'>
                 <IoSearch className='text-[20px]' />
@@ -287,7 +289,7 @@ const ProductAttribute = () => {
                   <TableHead>
                     <TableRow className='!bg-[#F9FAFB]'>
                       {/* Define your table header columns */}
-                      <TableCell style={{ minWidth: 50 }}>SL no</TableCell>
+                      <TableCell style={{ minWidth: 50 }}>Sl No</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Product Attibute Name</TableCell>
                       <TableCell style={{ minWidth: 50 }}>Status</TableCell>
                       <TableCell style={{ minWidth: 50 }}>Change Status</TableCell>
@@ -297,9 +299,9 @@ const ProductAttribute = () => {
                   </TableHead>
                   {filteredRows.length > 0 ?
                     <TableBody>
-                      {paginatedRows.map((row) => (
+                      {paginatedRows.map((row,i) => (
                         <TableRow key={row.id} >
-                          <TableCell>{row.id}</TableCell>
+                          <TableCell>{startIndex+i+1}</TableCell>
                           <TableCell>
                             {row.attribute_name}
                           </TableCell>

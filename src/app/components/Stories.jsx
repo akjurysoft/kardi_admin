@@ -710,7 +710,7 @@ const Stories = () => {
                                                                 <TableHead>
                                                                     <TableRow className='!bg-[#F9FAFB]'>
                                                                         {/* Define your table header columns */}
-                                                                        <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                                                        <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                                                         <TableCell style={{ minWidth: 200 }}>Customer Name</TableCell>
                                                                         <TableCell style={{ minWidth: 150 }}>Gender</TableCell>
                                                                         <TableCell style={{ minWidth: 150 }}>Customer Info</TableCell>
@@ -868,7 +868,7 @@ const Stories = () => {
                                                                 <TableHead>
                                                                     <TableRow className='!bg-[#F9FAFB]'>
                                                                         {/* Define your table header columns */}
-                                                                        <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                                                        <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                                                         <TableCell style={{ minWidth: 200 }}>Customer Name</TableCell>
                                                                         <TableCell style={{ minWidth: 150 }}>Gender</TableCell>
                                                                         <TableCell style={{ minWidth: 150 }}>Customer Info</TableCell>
@@ -1342,7 +1342,7 @@ const Stories = () => {
                                     <TableRow className='!bg-[#F9FAFB]'>
                                         {/* Define your table header columns */}
                                         <TableCell style={{ minWidth: 30 }}></TableCell>
-                                        <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                        <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                         <TableCell style={{ minWidth: 100 }}>Product Image</TableCell>
                                         <TableCell style={{ minWidth: 100 }}>Product Name</TableCell>
                                         <TableCell style={{ minWidth: 100 }}>Quantity</TableCell>

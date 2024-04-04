@@ -445,7 +445,7 @@ const SubCategory = () => {
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Sub Category Name *</span>
-              <input type='text' placeholder='Ex: Horn' className='inputText' id='sub_category_name' name='sub_category_name' onChange={getData} />
+              <input type='text' placeholder='Ex: Accessories' className='inputText' id='sub_category_name' name='sub_category_name' onChange={getData} />
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Sub Category Image *</span>
@@ -471,7 +471,7 @@ const SubCategory = () => {
             <div className='flex items-center justify-between'>
               <div className='flex space-x-2 items-center'>
                 <span className='text-[18px] font-[500] text-[#101828]'>Sub Category Table</span>
-                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{subCategoryData.length} Sub Category</span>
+                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{subCategoryData.length} Sub Categories</span>
               </div>
               <div className='flex items-center space-x-3 inputText w-[50%]'>
                 <IoSearch className='text-[20px]' />
@@ -492,10 +492,10 @@ const SubCategory = () => {
                 <TableHead>
                   <TableRow className='!bg-[#F9FAFB]'>
                     {/* Define your table header columns */}
-                    <TableCell style={{ minWidth: 80 }}>SL no</TableCell>
-                    <TableCell style={{ minWidth: 150 }}>Category image</TableCell>
+                    <TableCell style={{ minWidth: 80 }}>Sl No</TableCell>
+                    <TableCell style={{ minWidth: 150 }}>Category Image</TableCell>
                     <TableCell style={{ minWidth: 200 }}>Category Name</TableCell>
-                    <TableCell style={{ minWidth: 200 }}>Sub Category image</TableCell>
+                    <TableCell style={{ minWidth: 200 }}>Sub Category Image</TableCell>
                     <TableCell style={{ minWidth: 200 }}>Sub Category Name</TableCell>
                     <TableCell style={{ minWidth: 150 }}>Status</TableCell>
                     <TableCell style={{ minWidth: 150 }}>Change Status</TableCell>

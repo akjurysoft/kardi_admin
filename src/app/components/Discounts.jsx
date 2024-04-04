@@ -385,7 +385,7 @@ const Discounts = () => {
         if (res.data.status === 'success') {
           openSnackbar(res.data.message, 'success');
           fetchDiscountsData()
-        }else{
+        } else {
           openSnackbar(res.data.message, 'error');
         }
       })
@@ -418,7 +418,7 @@ const Discounts = () => {
             if (res.data.status === 'success') {
               openSnackbar(res.data.message, 'success');
               fetchDiscountsData()
-            }else{
+            } else {
               openSnackbar(res.data.message, 'error');
             }
           })
@@ -434,6 +434,7 @@ const Discounts = () => {
   // --------------------------edit discounts section starts--------------------------------
   const [isEditable, setIsEditable] = useState(false)
   const [editData, setEditData] = useState({})
+  console.log(editData)
 
   const handleEdit = (data) => {
     setEditData(data)
@@ -442,6 +443,7 @@ const Discounts = () => {
 
   const resetButton = () => {
     setIsEditable(false)
+    setEditData({})
   }
 
   function formatDate(dateString) {
@@ -607,7 +609,7 @@ const Discounts = () => {
                   <TableHead>
                     <TableRow className='!bg-[#F9FAFB]'>
                       {/* Define your table header columns */}
-                      <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                      <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                       <TableCell style={{ minWidth: 200 }}>Title</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Offer Image</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Product Brand</TableCell>
@@ -719,68 +721,104 @@ const Discounts = () => {
           <div className='grid grid-cols-3 gap-4 gap-[10px]'>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Name </span>
-              <input type='text' placeholder='Horn' className='inputText' name='sub_category_name' />
+              <input type='text' placeholder='Horn' className='inputText' defaultValue={editData.discount_name} name='sub_category_name' />
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Brands </span>
-              <select name='category_id' >
-                <option>Select Coupon Type Here</option>
+              <select name='edit_product_brand_id' id='edit_product_brand_id' defaultValue={editData.product_brand?.id} >
+                <option value=''>Select Product brand Here</option>
+                {getAllProductBrands && getAllProductBrands.filter(e => e.status).map((e, i) =>
+                  <option key={i} value={e.id}>{e.brand_name}</option>
+                )}
               </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Category </span>
-              <select name='category_id' >
-                <option>Select Coupon Type Here</option>
+              <select name='category_id' id='category_id' defaultValue={editData.category?.id || ''} onChange={e => setSelectedCategory(e.target.value)}>
+                <option value=''>Select category  Here</option>
+                {getAllCategories && getAllCategories.filter(e => e.status).map((e, i) =>
+                  <option key={i} value={e.id}>{e.category_name}</option>
+                )}
               </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Sub Category </span>
-              <select name='category_id' >
-                <option>Select Coupon Type Here</option>
+              <select name='sub_category_id' id='sub_category_id' defaultValue={editData.sub_category?.id || ''} onChange={e => setSelectedSubCategory(e.target.value)}>
+                <option value=''>Select Sub category Type Here</option>
+                {subCategoryData && subCategoryData.filter(e => e.status).map((e, i) =>
+                  <option key={i} value={e.id}>{e.sub_category_name}</option>
+                )}
               </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Super Sub Category </span>
-              <select name='category_id' >
-                <option>Select Coupon Type Here</option>
+              <select name='super_sub_category_id' id='super_sub_category_id' defaultValue={editData.super_sub_category?.id || ''} onChange={e => setSelectedSuperSubCategory(e.target.value)}>
+                <option value=''>Select Super sub category Here</option>
+                {superSubCategoryData && superSubCategoryData.filter(e => e.status).map((e, i) =>
+                  <option key={i} value={e.id}>{e.super_sub_category_name}</option>
+                )}
               </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Product </span>
-              <select name='category_id' >
-                <option>Select Coupon Type Here</option>
-              </select>
+              <FormControl fullWidth>
+                <Autocomplete
+                  multiple
+                  options={filteredProducts}
+                  getOptionLabel={(option) => option.product_name}
+                  value={editData.product_discount_associations.map(item => item.product)}
+                  onChange={handleProductChange}
+                  renderOption={(props, option, { selected }) => (
+                    <li {...props}>
+                      <Checkbox color="primary" checked={selected || editData.product_discount_associations.some(item => item.product.id === option.id)} />
+                      {option.product_name}
+                    </li>
+                  )}
+                  style={{ width: '100%' }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Search Products"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </FormControl>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Discount Type </span>
-              <select name='category_id' >
-                <option>Select Coupon Type Here</option>
-              </select>
+                <span>Discount Type </span>
+                <select name='discount_type' defaultValue={editData.discount_type || ''} >
+                    <option value=''>Select Discount Type Here</option>
+                    <option value='Amount'>Amount</option>
+                    <option value="Percent">Percent</option>
+                </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Discount Amount </span>
-              <input type='text' placeholder='Horn' className='inputText' name='sub_category_name' />
+                <span>Discount Amount </span>
+                <input type='text' placeholder='Discount Amount' className='inputText' id='discount' name='discount'  defaultValue={editData.discount || ''} />
             </div>
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Minimum Purchase </span>
-              <input type='text' placeholder='Horn' className='inputText' name='sub_category_name' />
+                <span>Minimum Purchase </span>
+                <input type='text' placeholder='Minimum Purchase' className='inputText' id='min_amount' name='min_amount'  defaultValue={editData.min_amount || ''} />
             </div>
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Maximum Discount </span>
-              <input type='text' placeholder='Horn' className='inputText' name='sub_category_name' />
+                <span>Maximum Discount </span>
+                <input type='text' placeholder='Maximum Discount' className='inputText' id='max_amount' name='max_amount'  defaultValue={editData.max_amount || ''} />
             </div>
+
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Start Date </span>
-              <input type='Date' placeholder='Horn' className='inputText' name='sub_category_name' />
+                <span>Start Date </span>
+                <input type='Date' placeholder='Start Date' className='inputText' id='start_date' name='start_date'  defaultValue={editData.start_date ? new Date(editData.start_date).toISOString().substr(0, 10) : ''}/>
             </div>
+
             <div className='flex flex-col space-y-1 w-full'>
-              <span>Expiry Date </span>
-              <input type='Date' placeholder='Horn' className='inputText' name='sub_category_name' />
+                <span>Expiry Date </span>
+                <input type='Date' placeholder='Expiry Date' className='inputText' id='expiry_date' name='expiry_date'  defaultValue={editData.expiry_date ? new Date(editData.expiry_date).toISOString().substr(0, 10) : ''}  />
             </div>
           </div>
 
           <div className='flex items-center gap-[24px] justify-end'>
-            <span className='resetButton' onClick={resetButton}>Reset</span>
+            <span className='resetButton' onClick={resetButton}>Back</span>
             <span className='submitButton'>Submit</span>
           </div>
         </div>

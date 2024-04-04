@@ -514,7 +514,7 @@ const resetData = () => {
                   <TableHead>
                     <TableRow className='!bg-[#F9FAFB]'>
                       {/* Define your table header columns */}
-                      <TableCell style={{ minWidth: 50 }}>SL no</TableCell>
+                      <TableCell style={{ minWidth: 50 }}>Sl No</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Title</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Website Banner</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Mobile Banner</TableCell>

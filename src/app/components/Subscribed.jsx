@@ -154,7 +154,7 @@ const Subscribed = () => {
                             <TableHead>
                                 <TableRow className='!bg-[#F9FAFB]'>
                                     {/* Define your table header columns */}
-                                    <TableCell>SL no</TableCell>
+                                    <TableCell>Sl No</TableCell>
                                     <TableCell >Email Id</TableCell>
                                     <TableCell style={{ minWidth: 50 }}>Status</TableCell>
                                     <TableCell style={{ minWidth: 50 }}>Change Status</TableCell>

@@ -333,7 +333,7 @@ const ProductBrands = () => {
                 <TableHead>
                   <TableRow className='!bg-[#F9FAFB]'>
                     {/* Define your table header columns */}
-                    <TableCell style={{ minWidth: 50 }}>SL no</TableCell>
+                    <TableCell style={{ minWidth: 50 }}>Sl No</TableCell>
                     <TableCell style={{ minWidth: 150 }}>Product Brand Image</TableCell>
                     <TableCell style={{ minWidth: 150 }}>Product Brand Name</TableCell>
                     <TableCell style={{ minWidth: 50 }}>Status</TableCell>

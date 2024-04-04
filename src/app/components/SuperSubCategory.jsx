@@ -549,14 +549,14 @@ const SuperSubCategory = () => {
             <div className='flex items-center justify-between'>
               <div className='flex space-x-2 items-center'>
                 <span className='text-[18px] font-[500] text-[#101828]'>Super Sub Category Table</span>
-                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{superSubCategoryData.length} Super Sub Category</span>
+                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{superSubCategoryData.length} Super Sub Categories</span>
               </div>
               <div className='flex items-center space-x-3 inputText w-[50%]'>
                 <IoSearch className='text-[20px]' />
                 <input
                   type='text'
                   className='outline-none focus-none w-full'
-                  placeholder='Search Super SubCategory Name here'
+                  placeholder='Search Super Sub Categories'
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -570,12 +570,12 @@ const SuperSubCategory = () => {
                 <TableHead>
                   <TableRow className='!bg-[#F9FAFB]'>
                     {/* Define your table header columns */}
-                    <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
-                    <TableCell style={{ minWidth: 200 }}>Category image</TableCell>
+                    <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
+                    <TableCell style={{ minWidth: 200 }}>Category Image</TableCell>
                     <TableCell style={{ minWidth: 200 }}>Category Name</TableCell>
-                    <TableCell style={{ minWidth: 200 }}>Sub Category image</TableCell>
+                    <TableCell style={{ minWidth: 200 }}>Sub Category Image</TableCell>
                     <TableCell style={{ minWidth: 200 }}>Sub Category Name</TableCell>
-                    <TableCell style={{ minWidth: 250 }}>Super Sub Category image</TableCell>
+                    <TableCell style={{ minWidth: 250 }}>Super Sub Category Image</TableCell>
                     <TableCell style={{ minWidth: 250 }}>Super Sub Category Name</TableCell>
                     <TableCell style={{ minWidth: 100 }}>Status</TableCell>
                     <TableCell style={{ minWidth: 150 }}>Change Status</TableCell>

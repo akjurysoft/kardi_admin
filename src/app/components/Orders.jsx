@@ -441,7 +441,7 @@ const Orders = () => {
                                     <TableHead>
                                         <TableRow className='!bg-[#F9FAFB]'>
                                             {/* Define your table header columns */}
-                                            <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                            <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                             <TableCell style={{ minWidth: 150 }}>Order ID</TableCell>
                                             <TableCell style={{ minWidth: 150 }}>Order Date</TableCell>
                                             {/* <TableCell style={{ minWidth: 150 }}>Delivery Date</TableCell> */}
@@ -669,7 +669,7 @@ const Orders = () => {
                                     <TableHead>
                                         <TableRow className='!bg-[#F9FAFB]'>
                                             {/* Define your table header columns */}
-                                            <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                            <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                             <TableCell style={{ minWidth: 100 }}>Product Image</TableCell>
                                             <TableCell style={{ minWidth: 100 }}>Product Name</TableCell>
                                             <TableCell style={{ minWidth: 100 }}>Quantity</TableCell>

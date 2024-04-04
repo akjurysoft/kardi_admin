@@ -16,7 +16,9 @@ import { Autocomplete, Checkbox, FormControl, InputLabel, MenuItem, Select } fro
 import { getCarBrands, getCategories, getProductAttributes, getProductBrands, getSubCategories, getSuperSubCategories } from '../api';
 import * as XLSX from 'xlsx';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 
+const CustomEditor = dynamic(() => import('../custom-editor'), { ssr: false });
 
 const ProductList = () => {
   const { openSnackbar } = useSnackbar();
@@ -324,6 +326,10 @@ const ProductList = () => {
     warranty: ''
   })
 
+  const [editorData, setEditorData] = useState('');
+    const handleEditorChange = (data) => {
+        setEditorData(data);
+    };
 
   const getData = (e) => {
     const { value, name } = e.target;
@@ -426,7 +432,7 @@ const ProductList = () => {
     } else {
       const formData = new FormData();
       formData.append('product_name', getProductData.product_name)
-        formData.append('product_desc', getProductData.product_desc)
+        formData.append('product_desc', editorData)
         formData.append('product_brand_id', getProductData.product_brand_id)
         formData.append('category_id', selectedCategory)
         if(selectedSubCategory){
@@ -860,7 +866,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                     <TableHead>
                       <TableRow className='!bg-[#F9FAFB]'>
                         {/* Define your table header columns */}
-                        <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                        <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                         <TableCell style={{ minWidth: 200 }}>Car Brand</TableCell>
                         <TableCell style={{ minWidth: 150 }}>Product Image</TableCell>
                         <TableCell style={{ minWidth: 300 }}>Product Name</TableCell>
@@ -958,7 +964,8 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
-                  <textarea className='outline-none focus-none inputText !text-[14px] h-[120px]' placeholder='Add product description' name='product_desc' onChange={getData} />
+                  {/* <textarea className='outline-none focus-none inputText !text-[14px] h-[120px]' placeholder='Add product description' name='product_desc' onChange={getData} /> */}
+                  <CustomEditor  name='product_desc' onChange={handleEditorChange}/>
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'> Product Brand Name</span>

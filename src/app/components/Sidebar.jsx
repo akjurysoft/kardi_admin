@@ -96,11 +96,11 @@ const Sidebar = () => {
                                 </div>
                                 <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'subcategory' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('subcategory')}>
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
-                                    <span className='text-[15px] hover:text-[#FCF8EE]'>Sub categories</span>
+                                    <span className='text-[15px] hover:text-[#FCF8EE]'>Sub Categories</span>
                                 </div>
                                 <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'supersubcategory' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('supersubcategory')}>
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
-                                    <span className='text-[15px] hover:text-[#FCF8EE]'>Super Sub categories</span>
+                                    <span className='text-[15px] hover:text-[#FCF8EE]'>Super Sub Categories</span>
                                 </div>
                             </div>
                         )}

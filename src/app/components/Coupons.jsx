@@ -783,7 +783,7 @@ const Coupons = () => {
                   <TableHead>
                     <TableRow className='!bg-[#F9FAFB]'>
                       {/* Define your table header columns */}
-                      <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                      <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Coupons</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Coupon Type</TableCell>
                       <TableCell style={{ minWidth: 250 }}>Duration</TableCell>

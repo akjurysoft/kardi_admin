@@ -299,7 +299,7 @@ const Dealers = () => {
                                         <TableHead>
                                             <TableRow className='!bg-[#F9FAFB]'>
                                                 {/* Define your table header columns */}
-                                                <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                                <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                                 <TableCell style={{ minWidth: 150 }}>Delar ID</TableCell>
                                                 <TableCell style={{ minWidth: 150 }}>Delar Name</TableCell>
                                                 <TableCell style={{ minWidth: 100 }}>Gender</TableCell>
@@ -496,7 +496,7 @@ const Dealers = () => {
                                 <Table stickyHeader aria-label="sticky table">
                                     <TableHead>
                                         <TableRow className='!bg-[#F9FAFB]'>
-                                            <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                            <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                             <TableCell style={{ minWidth: 100 }}>Product Image</TableCell>
                                             <TableCell style={{ minWidth: 100 }}>Product Name</TableCell>
                                             <TableCell style={{ minWidth: 100 }}>Quantity</TableCell>

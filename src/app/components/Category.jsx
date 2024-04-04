@@ -416,7 +416,7 @@ const Category = () => {
             <div className='flex items-center justify-between'>
               <div className='flex space-x-2 items-center'>
                 <span className='text-[18px] font-[500] text-[#101828]'>Category Table</span>
-                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{categoryData.length} category</span>
+                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{categoryData.length} Categories</span>
               </div>
               <div className='flex items-center space-x-3 inputText w-[50%]'>
                 <IoSearch className='text-[20px]' />
@@ -437,8 +437,8 @@ const Category = () => {
                   <TableHead>
                     <TableRow className='!bg-[#F9FAFB]'>
                       {/* Define your table header columns */}
-                      <TableCell style={{ minWidth: 80 }}>SL no</TableCell>
-                      <TableCell style={{ minWidth: 150 }}>Category image</TableCell>
+                      <TableCell style={{ minWidth: 80 }}>Sl No</TableCell>
+                      <TableCell style={{ minWidth: 150 }}>Category Image</TableCell>
                       <TableCell style={{ minWidth: 200 }}>Category Name</TableCell>
                       <TableCell style={{ minWidth: 50 }}>Status</TableCell>
                       <TableCell style={{ minWidth: 50 }}>Change Status</TableCell>

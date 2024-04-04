@@ -327,7 +327,7 @@ const CarBrands = () => {
                                 <TableHead>
                                     <TableRow className='!bg-[#F9FAFB]'>
                                         {/* Define your table header columns */}
-                                        <TableCell style={{ minWidth: 50 }}>SL no</TableCell>
+                                        <TableCell style={{ minWidth: 50 }}>Sl No</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Car Brand Image</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Car Brand Name</TableCell>
                                         <TableCell style={{ minWidth: 50 }}>Status</TableCell>

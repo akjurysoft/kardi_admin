@@ -479,7 +479,7 @@ const DynamicPages = () => {
                                                         <TableHead>
                                                             <TableRow className='!bg-[#F9FAFB]'>
                                                                 {/* Define your table header columns */}
-                                                                <TableCell style={{ minWidth: 100 }}>SL no</TableCell>
+                                                                <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
                                                                 <TableCell style={{ minWidth: 200 }}>Customer Name</TableCell>
                                                                 <TableCell style={{ minWidth: 150 }}>Customer Info</TableCell>
                                                                 <TableCell style={{ minWidth: 150 }}>Created Date</TableCell>

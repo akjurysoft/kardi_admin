@@ -441,7 +441,9 @@ const ProductList = () => {
         if(selectedSuperSubCategory){
           formData.append('super_sub_category_id', selectedSuperSubCategory)
         }
-        formData.append('minimum_order', getProductData.minimum_order)
+        if(getProductData.minimum_order){
+          formData.append('minimum_order', getProductData.minimum_order)
+        }
         formData.append('default_price', getProductData.default_price)
         formData.append('stock', getProductData.stock)
         formData.append('product_type', selectedProductType)
@@ -1056,7 +1058,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 <span className='text-[18px] font-[600]'>Price Info</span>
                 <div className='flex items-center justify-between gap-[10px]'>
                   <div className='flex flex-col space-y-1 w-full'>
-                    <span className='text-[14px] text-[#344054] font-[500]'>Default Unit Price</span>
+                    <span className='text-[14px] text-[#344054] font-[500]'>Selling Price</span>
                     <input type='text' className='outline-none focus-none inputText !text-[14px]' placeholder='Price of product (in rupees)' name='default_price' onChange={getData} />
                   </div>
                   <div className='flex flex-col space-y-1 w-full'>

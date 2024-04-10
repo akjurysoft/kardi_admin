@@ -467,7 +467,9 @@ const Stories = () => {
 
     const fileInputRefVideo = useRef(null);
     const [uploadedVideo, setUploadedVideo] = useState(null);
+    console.log('uploadedVideo', uploadedVideo)
     const [storyVideo, setVideo] = useState({})
+    console.log('storyVideo', storyVideo)
 
     const handleButtonClickVideo = () => {
         if (fileInputRefVideo.current) {
@@ -576,8 +578,15 @@ const Stories = () => {
     const fileInputRefEditImage = useRef(null);
     const [uploadedEditVideo, setUploadedEditVideo] = useState(null);
     const [uploadedEditImage, setUploadedEditImage] = useState(null);
-    const [editImage , setEditImage] = useState({})
-    const [editVideo , setEditVideo] = useState({})
+    const [editImage, setEditImage] = useState({})
+    const [editVideo, setEditVideo] = useState({})
+    console.log('uploadedEditVideo', uploadedEditVideo)
+
+    const handleButtonClickEditVideo = () => {
+        if (fileInputRefEditVideo.current) {
+            fileInputRefEditVideo.current.click();
+        }
+    };
 
     const handleFileChangeEditVideo = (event) => {
         const file = event.target.files[0];
@@ -585,11 +594,7 @@ const Stories = () => {
         setEditVideo(file);
     };
 
-    const handleButtonClickEditVideo = () => {
-        if (fileInputRefEditVideo.current) {
-            fileInputRefEditVideo.current.click();
-        }
-    };
+
 
     const handleStoryEditVideoRemove = () => {
         setUploadedEditVideo(null);
@@ -630,11 +635,11 @@ const Stories = () => {
         formData.append('customer_id', editData.customer_id);
         formData.append('heading', editData.heading);
         formData.append('description', editData.description);
-        if(Object.keys(editImage).length){
-            formData.append('image',  editImage);
+        if (Object.keys(editImage).length) {
+            formData.append('image', editImage);
         }
-        if(Object.keys(editVideo).length){
-            formData.append('image',  editVideo);
+        if (Object.keys(editVideo).length) {
+            formData.append('image', editVideo);
         }
         formData.append('product_ids', JSON.stringify(selectedProductIds));
 
@@ -748,7 +753,7 @@ const Stories = () => {
                                                                                 <TableCell>560098</TableCell>
                                                                                 <TableCell>560098</TableCell>
                                                                                 <TableCell>
-                                                                                    <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image_url}`} width={100} height={100} alt={row.heading} className='rounded-[8px]' />
+                                                                                    <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image_url}`} width={100} height={100} alt={row.heading} className='rounded-[8px] h-[100px] w-[100px]' />
                                                                                     {/* <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image_url}`} width={100} height={100} alt='categroy' className='rounded-[8px]' /> */}
                                                                                 </TableCell>
                                                                                 <TableCell>
@@ -908,7 +913,7 @@ const Stories = () => {
                                                                                 <TableCell>
                                                                                     <>
                                                                                         <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                                                            <video src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image_url}`} width='100%' height='100%' alt={row.heading} className='rounded-[8px]' style={{ opacity: 0.5 }} />
+                                                                                            <video src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image_url}`} width='100%' height='100%' alt={row.heading} className='rounded-[8px] h-[100px] w-[100px]' style={{ opacity: 0.5 }} />
                                                                                             <IconButton onClick={() => handleOpen(row)} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1 }}>
                                                                                                 <PlayArrowIcon />
                                                                                             </IconButton>
@@ -1190,7 +1195,7 @@ const Stories = () => {
                             <IconButton onClick={handleClose} style={{ position: 'absolute', top: 0, right: 5, zIndex: 2 }}>
                                 <CloseIcon />
                             </IconButton>
-                            <video width='100%' height='100%' controls className='p-[10px]'>
+                            <video width='100%' height='100%' controls className='p-[10px]  h-[500px] w-[100%]'>
                                 <source src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${selectedVideo.image_url}`} type="video/mp4" className='rounded-[8px]' />
                                 Your browser does not support the video tag.
                             </video>
@@ -1302,10 +1307,24 @@ const Stories = () => {
                             <>
                                 {editData.story_type === 'video' ?
                                     <>
-                                        {editData && (
+                                        {editData.image_url && (
                                             <div className="p-2 relative">
                                                 <video className="max-w-[200px] max-h-[200px]" >
-                                                    <source src={uploadedEditVideo} type="video/mp4"/>
+                                                    <source src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${editData.image_url}`} type="video/mp4" />
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                                {/* <button
+                                                    className={`absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 ${uploadedEditVideo ? 'block' : 'hidden'}`}
+                                                    onClick={handleStoryEditVideoRemove}
+                                                >
+                                                    <FaTimes className='text-[10px]' />
+                                                </button> */}
+                                            </div>
+                                        )}
+                                        {uploadedEditVideo && (
+                                            <div className="p-2 relative">
+                                                <video className="max-w-[200px] max-h-[200px]" >
+                                                    <source src={uploadedEditVideo} type="video/mp4" />
                                                     Your browser does not support the video tag.
                                                 </video>
                                                 <button
@@ -1332,6 +1351,67 @@ const Stories = () => {
                                         )}
                                     </>
                                 }
+                                {/* {editData.story_type === 'video' ? (
+                                    <>
+                                        {uploadedEditVideo ? (
+                                            <div className="p-2 relative">
+                                                <video className="max-w-[200px] max-h-[200px]" controls>
+                                                    <source src={uploadedEditVideo || `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${editData.image_url}`} type="video/mp4" />
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                                <button
+                                                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                                                    onClick={handleStoryEditVideoRemove}
+                                                >
+                                                    <FaTimes className='text-[10px]' />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    className='text-[12px] text-[#A1853C] font-[600] rounded hover:text-[#A1853C]/60 transition duration-300'
+                                                    onClick={handleButtonClickEditVideo}
+                                                >
+                                                    Click to Upload Video
+                                                </button>
+                                                <input
+                                                    type='file'
+                                                    ref={fileInputRefEditVideo}
+                                                    className='hidden'
+                                                    onChange={handleFileChangeEditVideo}
+                                                    accept='video/*'
+                                                />
+                                            </>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            className='text-[12px] text-[#A1853C] font-[600] rounded hover:text-[#A1853C]/60 transition duration-300'
+                                            onClick={handleButtonClickEditImage}
+                                        >
+                                            Click to Upload Image
+                                        </button>
+                                        <input
+                                            type='file'
+                                            ref={fileInputRefEditImage}
+                                            className='hidden'
+                                            onChange={handleFileChangeEditImage}
+                                            accept='image/*'
+                                        />
+                                        {uploadedEditImage && (
+                                            <div className="p-2 relative">
+                                                <img src={uploadedEditImage} alt="Uploaded Website Banner" className="max-w-[200px] max-h-[200px]" />
+                                                <button
+                                                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                                                    onClick={handleStoryEditImageRemove}
+                                                >
+                                                    <FaTimes className='text-[10px]' />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )} */}
                             </>
                         </div>
                     </div>
@@ -1342,17 +1422,18 @@ const Stories = () => {
                                     <TableRow className='!bg-[#F9FAFB]'>
                                         {/* Define your table header columns */}
                                         <TableCell style={{ minWidth: 30 }}></TableCell>
-                                        <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
+                                        <TableCell style={{ minWidth: 50 }}>Sl No</TableCell>
+                                        <TableCell style={{ minWidth: 100 }}>Order Id</TableCell>
                                         <TableCell style={{ minWidth: 100 }}>Product Image</TableCell>
                                         <TableCell style={{ minWidth: 100 }}>Product Name</TableCell>
-                                        <TableCell style={{ minWidth: 100 }}>Quantity</TableCell>
+                                        {/* <TableCell style={{ minWidth: 100 }}>Quantity</TableCell>
                                         <TableCell style={{ minWidth: 50 }}>Price</TableCell>
                                         <TableCell style={{ minWidth: 100 }}>Discount</TableCell>
-                                        <TableCell style={{ minWidth: 100 }}>Total Price</TableCell>
+                                        <TableCell style={{ minWidth: 100 }}>Total Price</TableCell> */}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {editData.customer.orders && editData.customer.orders.map((order, index) => (
+                                    {editData.customer.orders && editData.customer.orders.filter(order => order.order_status.status_name === 'Delivered').map((order, index) => (
                                         <React.Fragment key={index}>
                                             {order.order_details.map((orderDetail, detailIndex) => (
                                                 <TableRow key={detailIndex}>
@@ -1360,6 +1441,7 @@ const Stories = () => {
                                                         <Checkbox onChange={(event) => handleCheckboxChange(event, orderDetail.product.id)} />
                                                     </TableCell>
                                                     <TableCell>{index + 1}</TableCell>
+                                                    <TableCell>{order.order_id}</TableCell>
                                                     <TableCell>
                                                         {orderDetail.product_images.length > 0 && (
                                                             <img
@@ -1370,11 +1452,11 @@ const Stories = () => {
                                                             />
                                                         )}
                                                     </TableCell>
-                                                    <TableCell>{orderDetail.product.product_name}</TableCell>
-                                                    <TableCell>{orderDetail.quantity}</TableCell>
+                                                    <TableCell>{orderDetail.product?.product_name}</TableCell>
+                                                    {/* <TableCell>{orderDetail.quantity}</TableCell>
                                                     <TableCell>{orderDetail.sub_total}</TableCell>
                                                     <TableCell>₹ {orderDetail.sub_total}</TableCell>
-                                                    <TableCell>{orderDetail.total_amount}</TableCell>
+                                                    <TableCell>{orderDetail.total_amount}</TableCell> */}
                                                 </TableRow>
                                             ))}
                                         </React.Fragment>

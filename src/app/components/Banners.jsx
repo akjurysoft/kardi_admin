@@ -4,6 +4,7 @@ import Switch from '@mui/material/Switch';
 import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Pagination, TextField } from '@mui/material';
 import Image from 'next/image';
 import { IoSearch } from "react-icons/io5";
+import Swal from 'sweetalert2'
 import { FaRegTrashAlt } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import { MdAdd } from 'react-icons/md';
@@ -37,35 +38,135 @@ const Banners = () => {
 
   const filteredProducts = getAllProducts.filter(product => product.status === 1);
 
-  const [getAllCategories, setGetAllCategories] = useState([])
+  // const [getAllCategories, setGetAllCategories] = useState([])
+  // const fetchCategory = async () => {
+  //   try {
+  //     const categoryData = await getCategories();
+  //     setGetAllCategories(categoryData.categories);
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
+
+  // const [getAllSubCategories, setGetAllSubCategories] = useState([])
+  // const fetchSubCategory = async () => {
+  //   try {
+  //     const subCatgeoryData = await getSubCategories();
+  //     setGetAllSubCategories(subCatgeoryData.subcategories);
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
+
+  // const [getAllSuperSubCategories, setGetAllSuperSubCategories] = useState([])
+  // const fetchSuperSubCategory = async () => {
+  //   try {
+  //     const superSubCategoryData = await getSuperSubCategories();
+  //     setGetAllSuperSubCategories(superSubCategoryData.superSubcategories);
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
+
+  // ----------------------------------------------Fetch Category section Starts-----------------------------------------------------
+  const [categoryData, setCategoryData] = useState([])
+  const [selectedCategory , setSelectedCategory] = useState(null)
+  console.log(selectedCategory)
   const fetchCategory = async () => {
     try {
-      const categoryData = await getCategories();
-      setGetAllCategories(categoryData.categories);
+      const getAllcategoryData = await getCategories();
+      setCategoryData(getAllcategoryData.categories);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
   };
 
-  const [getAllSubCategories, setGetAllSubCategories] = useState([])
-  const fetchSubCategory = async () => {
-    try {
-      const subCatgeoryData = await getSubCategories();
-      setGetAllSubCategories(subCatgeoryData.subcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
+  // ----------------------------------------------Fetch Category section Ends-----------------------------------------------------
 
-  const [getAllSuperSubCategories, setGetAllSuperSubCategories] = useState([])
-  const fetchSuperSubCategory = async () => {
-    try {
-      const superSubCategoryData = await getSuperSubCategories();
-      setGetAllSuperSubCategories(superSubCategoryData.superSubcategories);
-    } catch (error) {
-      console.error('Error fetching products:', error);
+  // ----------------------------------------------Fetch Sub Category section Starts-----------------------------------------------------
+  const [subCategoryData, setSubCategoryData] = useState([])
+  const [selectedSubCategory , setSelectedSubCategory] = useState(null)
+  useEffect(() => {
+    setSelectedSubCategory(null)
+    setSelectedSuperSubCategory(null)
+    if (document.getElementById('sub_category_id')) {
+      document.getElementById('sub_category_id').value = '';
     }
-  };
+    if (document.getElementById('super_sub_category_id')) {
+      document.getElementById('super_sub_category_id').value = '';
+    }
+    if (selectedCategory) {
+      fetchSubCategoryData(selectedCategory);
+    }
+  }, [selectedCategory]);
+
+ 
+  const fetchSubCategoryData = useCallback(
+    (selectedCategory) => {
+      axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`,{
+        headers : {
+          Authorization : localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            setSubCategoryData(res.data.subcategories)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
+  // ----------------------------------------------Fetch Sub Category section Ends-----------------------------------------------------
+
+
+  // ----------------------------------------------Fetch Super Sub Category section Starts-----------------------------------------------------
+  const [superSubCategoryData, setSuperSubCategoryData] = useState([])
+  const [selectedSuperSubCategory , setSelectedSuperSubCategory] = useState(null)
+  useEffect(() => {
+    setSelectedSuperSubCategory(null)
+    if (document.getElementById('super_sub_category_id')) {
+      document.getElementById('super_sub_category_id').value = ''
+    }
+    if (selectedSubCategory) {
+      fetchSuperSubCategoryData(selectedSubCategory);
+    }
+  }, [selectedSubCategory]);
+  const fetchSuperSubCategoryData = useCallback(
+    (selectedSubCategory) => {
+      axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`,{
+        headers : {
+          Authorization : localStorage.getItem('kardifyAdminToken')
+        }
+      })
+        .then((res) => {
+          if (res.data.code == 200) {
+            setSuperSubCategoryData(res.data.superSubcategories)
+          } else if (res.data.message === 'Session expired') {
+            openSnackbar(res.data.message, 'error');
+            router.push('/login')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          if (err.response && err.response.data.statusCode === 400) {
+            openSnackbar(err.response.data.message, 'error');
+          }
+        })
+    },
+    [],
+  )
+  
+  // ----------------------------------------------Fetch Super Sub Category section Ends-----------------------------------------------------
+
 
   const [getAllBanners, setGetAllBanners] = useState([])
   const fetchBanner = async () => {
@@ -83,8 +184,8 @@ const Banners = () => {
   const fileInputRefMobile = useRef(null);
   const [uploadedImageWebsite, setUploadedImageWebsite] = useState(null);
   const [uploadedImageMobile, setUploadedImageMobile] = useState(null);
-  const [imageWeb , setImageWeb] = useState({})
-  const [imageMob , setImageMob] = useState({})
+  const [imageWeb, setImageWeb] = useState({})
+  const [imageMob, setImageMob] = useState({})
 
   const handleButtonClickWebsite = () => {
     fileInputRefWebsite.current.click();
@@ -94,13 +195,48 @@ const Banners = () => {
     fileInputRefMobile.current.click();
   };
 
+  //   const handleFileChangeWebsite = (e) => {
+  //     const file = e.target.files[0];
+  //     const reader = new FileReader();
+
+  //     reader.onload = (e) => {
+  //       setUploadedImageWebsite(e.target.result);
+  //       setImageWeb(file)
+  //     };
+
+  //     reader.readAsDataURL(file);
+  // }
+
   const handleFileChangeWebsite = (e) => {
     const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+
     const reader = new FileReader();
 
+    if (file.size > 2 * 1024 * 1024) {
+      openSnackbar("Please upload an image with size less than 2MB.", 'error');
+      e.target.value = null;
+      return;
+    }
+
+
     reader.onload = (e) => {
-      setUploadedImageWebsite(e.target.result);
-      setImageWeb(file)
+      const img = document.createElement('img');
+      img.src = e.target.result;
+
+      img.onload = () => {
+        if (img.width === 1370 && img.height === 532) {
+          setUploadedImageWebsite(e.target.result);
+          setImageWeb(file);
+        } else {
+          openSnackbar("Please upload an image with dimensions 1370 × 532 pixels.", 'error');
+          e.target.value = null;
+          setUploadedImageWebsite(null);
+          setImageWeb({});
+        }
+      };
     };
 
     reader.readAsDataURL(file);
@@ -108,7 +244,17 @@ const Banners = () => {
 
   const handleFileChangeMobile = (e) => {
     const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+
     const reader = new FileReader();
+
+    if (file.size > 2 * 1024 * 1024) {
+      openSnackbar("Please upload an image with size less than 2MB.", 'error');
+      e.target.value = null;
+      return;
+    }
 
     reader.onload = (e) => {
       setUploadedImageMobile(e.target.result);
@@ -144,8 +290,8 @@ const Banners = () => {
       // fetchAttributeData()
       fetchProducts()
       fetchCategory()
-      fetchSubCategory()
-      fetchSuperSubCategory()
+      // fetchSubCategory()
+      // fetchSuperSubCategory()
       fetchBanner()
     }
 
@@ -209,8 +355,12 @@ const Banners = () => {
   }
 
   const addBanner = () => {
+    if (!bannerDetails.banner_name) {
+      openSnackbar('Enter Banner Name', 'error')
+      return;
+    }
     if (itemType === 'Products') {
-      if(!imageMob.name || !imageWeb.name){
+      if (!imageMob.name || !imageWeb.name) {
         openSnackbar('Choose Image for both Web And Mobile', 'error')
         return;
       }
@@ -219,9 +369,9 @@ const Banners = () => {
       formData.append('banner_type', 'product');
       formData.append('web_image_url', imageWeb);
       formData.append('mob_image_url', imageMob);
-      
+
       const productIdsArray = selectedProducts.map(product => product.id);
-      formData.append('product_ids', JSON.stringify(productIdsArray)); 
+      formData.append('product_ids', JSON.stringify(productIdsArray));
 
       axios.post('/api/add-banner', formData, {
         headers: {
@@ -231,14 +381,14 @@ const Banners = () => {
       })
         .then(res => {
           console.log(res);
-          if(res.data.status === 'success'){
+          if (res.data.status === 'success') {
             openSnackbar(res.data.message, 'success')
             fetchBanner()
             resetData()
-          } else if(res.data.message === 'Session expired'){
+          } else if (res.data.message === 'Session expired') {
             router.push('/login')
             openSnackbar(res.data.message, 'error')
-          } else{
+          } else {
             openSnackbar(res.data.message, 'error')
           }
         })
@@ -247,66 +397,133 @@ const Banners = () => {
         });
     }
     else if (itemType === 'Category') {
-        if(!imageMob.name || !imageWeb.name){
-          openSnackbar('Choose Image for both Web And Mobile', 'error')
-          return;
+      if (!imageMob.name || !imageWeb.name) {
+        openSnackbar('Choose Image for both Web And Mobile', 'error')
+        return;
+      }
+
+      if (!selectedCategory) {
+        openSnackbar('Choose Category', 'error')
+      }
+      const formData = new FormData();
+      formData.append('banner_name', bannerDetails.banner_name);
+      formData.append('banner_type', 'category');
+      formData.append('category_id', selectedCategory);
+      if (selectedSubCategory) {
+        formData.append('sub_category_id', selectedSubCategory);
+      }
+      if (selectedSuperSubCategory) {
+        formData.append('super_sub_category_id', selectedSuperSubCategory);
+      }
+      formData.append('web_image_url', imageWeb);
+      formData.append('mob_image_url', imageMob);
+
+      axios.post('/api/add-banner', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: localStorage.getItem('kardifyAdminToken')
         }
-        const formData = new FormData();
-        formData.append('banner_name', bannerDetails.banner_name);
-        formData.append('banner_type', 'category');
-        formData.append('category_id', bannerDetails.category_id);
-        formData.append('sub_category_id', bannerDetails.sub_category_id);
-        formData.append('super_sub_category_id', bannerDetails.super_sub_category_id);
-        formData.append('web_image_url', imageWeb);
-        formData.append('mob_image_url', imageMob);
-  
-        axios.post('/api/add-banner', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: localStorage.getItem('kardifyAdminToken')
+      })
+        .then(res => {
+          if (res.data.status === 'success') {
+            openSnackbar(res.data.message, 'success')
+            fetchBanner()
+            resetData()
+          } else if (res.data.message === 'Session expired') {
+            router.push('/login')
+            openSnackbar(res.data.message, 'error')
+          } else {
+            openSnackbar(res.data.message, 'error')
           }
         })
-          .then(res => {
-            if(res.data.status === 'success'){
-              openSnackbar(res.data.message, 'success')
-              fetchBanner()
-              resetData()
-            } else if(res.data.message === 'Session expired'){
-              router.push('/login')
-              openSnackbar(res.data.message, 'error')
-            } else{
-              openSnackbar(res.data.message, 'error')
-            }
-          })
-          .catch(err => {
-            console.log(err);
-          });
+        .catch(err => {
+          console.log(err);
+        });
     } else {
       openSnackbar('Please Select any banner type', 'error');
     }
   }
 
-const resetData = () => {
-  setItemType('')
-  setImageMob({})
-  setImageWeb({})
-  setSelectedProducts([])
-  setBannerDetails({
-    banner_name: '',
-    category_id: '',
-    sub_category_id: '',
-    super_sub_category_id: ''
-  })
-  setUploadedImageMobile(null)
-  setUploadedImageWebsite(null)
-  // document.getElementById('banner_name').value= ''
-  // document.getElementById('category_id').value= ''
-  // document.getElementById('sub_category_id').value= ''
-  // document.getElementById('super_sub_category_id').value= ''
-  
-}
+  const resetData = () => {
+    setItemType('')
+    setImageMob({})
+    setImageWeb({})
+    setSelectedProducts([])
+    setBannerDetails({
+      banner_name: '',
+      category_id: '',
+      sub_category_id: '',
+      super_sub_category_id: ''
+    })
+    setUploadedImageMobile(null)
+    setUploadedImageWebsite(null)
+    document.getElementById('item_type').value = ''
+    document.getElementById('banner_name').value = ''
+    if (itemType === 'Category') {
+      document.getElementById('category_id').value = ''
+      document.getElementById('sub_category_id').value = ''
+      document.getElementById('super_sub_category_id').value = ''
+    }
+
+  }
 
   // --------------------------------- Add Banner Section Ends------------------------------------
+
+  // --------------------------------- Delete Banner Section Starts------------------------------------
+
+  const deleteBanner = (data) => {
+    Swal.fire({
+      title: "Delete",
+      text: `Do you want to Delete this ${data.banner_name}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#CFAA4C",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "No",
+      confirmButtonText: "Yes! Delete it"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.post(`/api/delete-banner?banner_id=${data.id}`, {}, {
+          headers: {
+            Authorization: localStorage.getItem('kardifyAdminToken')
+          }
+        })
+          .then(res => {
+            if (res.data.code == 200) {
+              fetchBanner()
+              openSnackbar(res.data.message, 'success');
+              if (page > 1 && paginatedRows.length === 1) {
+                setPage(page - 1);
+              }
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
+    });
+  };
+
+  // --------------------------------- Delete Banner Section Ends------------------------------------
+
+  // ----------------------------------------------Change status section Starts-----------------------------------------------------
+  const handleSwitchChange = (id) => {
+    axios.post(`/api/toggle-banner-status?banner_id=${id}`, {}, {
+      headers: {
+        Authorization: localStorage.getItem('kardifyAdminToken')
+      }
+    })
+      .then(res => {
+        if (res.data.status === 'success') {
+          openSnackbar(res.data.message, 'success');
+          fetchBanner()
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  };
+  // ----------------------------------------------Change status section Ends-----------------------------------------------------
 
   const [isEditable, setIsEditable] = useState(false)
   const [editData, setEditData] = useState({})
@@ -337,7 +554,7 @@ const resetData = () => {
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Item Type *</span>
-              <select onChange={(e) => setItemType(e.target.value)}>
+              <select name='item_type' id='item_type' onChange={(e) => setItemType(e.target.value)}>
                 <option>Choose Item Type</option>
                 <option>Products</option>
                 <option>Category</option>
@@ -347,27 +564,27 @@ const resetData = () => {
               <>
                 <div className='flex flex-col space-y-1 w-full'>
                   <span>Select Category *</span>
-                  <select name='category_id' id='category_id' onChange={getData}>
-                    <option>Choose Category</option>
-                    {getAllCategories && getAllCategories.filter(e => e.status).map((e, i) =>
+                  <select name='category_id' id='category_id' onChange={e => setSelectedCategory(e.target.value)}>
+                    <option value=''>Choose Category</option>
+                    {categoryData && categoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.category_name}</option>
                     )}
                   </select>
                 </div>
                 <div className='flex flex-col space-y-1 w-full'>
                   <span>Select Sub Category *</span>
-                  <select name='sub_category_id' id='sub_category_id' onChange={getData}>
-                    <option>Choose Sub Category</option>
-                    {getAllSubCategories && getAllSubCategories.filter(e => e.status).map((e, i) =>
+                  <select name='sub_category_id' id='sub_category_id' onChange={e => setSelectedSubCategory(e.target.value)}>
+                    <option value=''>Choose Sub Category</option>
+                    {subCategoryData && subCategoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.sub_category_name}</option>
                     )}
                   </select>
                 </div>
                 <div className='flex flex-col space-y-1 w-full'>
                   <span>Select Super Sub Category *</span>
-                  <select name='super_sub_category_id' id='super_sub_category_id' onChange={getData}>
-                    <option>Choose Super Sub Category</option>
-                    {getAllSuperSubCategories && getAllSuperSubCategories.filter(e => e.status).map((e, i) =>
+                  <select name='super_sub_category_id' id='super_sub_category_id' onChange={e => setSelectedSuperSubCategory(e.target.value)}>
+                    <option value=''>Choose Super Sub Category</option>
+                    {superSubCategoryData && superSubCategoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.super_sub_category_name}</option>
                     )}
                   </select>
@@ -407,6 +624,7 @@ const resetData = () => {
           <div className='flex items-baseline justify-between gap-[30px]'>
             <div className='flex flex-col space-y-2  w-[100%]'>
               <span className='text-[18px] font-[600]'>Website banner</span>
+              <span className='text-red-600 font-[400] text-[10px]'>Note: Only .png, .jpg, .jpeg format supported (Max. 2MB) (Dimesions : 1370px × 532px)</span>
               <div className="flex flex-col items-center justify-center text-[16px]">
                 <div className="flex flex-col space-y-1 items-center border border-dashed border-gray-400 p-[10px] rounded-lg text-center w-full">
                   <div className="text-[40px]">
@@ -445,6 +663,7 @@ const resetData = () => {
             </div>
             <div className='flex flex-col space-y-2  w-[100%]'>
               <span className='text-[18px] font-[600]'>Mobile banner</span>
+              <span className='text-red-600 font-[400] text-[10px]'>Note: Only .png, .jpg, .jpeg format supported (Max. 2MB)</span>
               <div className="flex flex-col items-center justify-center text-[16px]">
                 <div className="flex flex-col space-y-1 items-center border border-dashed border-gray-400 p-[10px] rounded-lg text-center w-full">
                   <div className="text-[40px]">
@@ -518,25 +737,25 @@ const resetData = () => {
                       <TableCell style={{ minWidth: 150 }}>Title</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Website Banner</TableCell>
                       <TableCell style={{ minWidth: 150 }}>Mobile Banner</TableCell>
-                      <TableCell style={{ minWidth: 50 }}>Status</TableCell>
+                      <TableCell style={{ minWidth: 100 }}>Status</TableCell>
                       <TableCell style={{ minWidth: 50 }}>Change Status</TableCell>
                       <TableCell style={{ minWidth: 50 }}>Delete</TableCell>
-                      <TableCell style={{ minWidth: 50 }}>Edit</TableCell>
+                      {/* <TableCell style={{ minWidth: 50 }}>Edit</TableCell> */}
                     </TableRow>
                   </TableHead>
                   {filteredRows.length > 0 ?
                     <TableBody>
-                      {paginatedRows.map((row , i) => (
+                      {paginatedRows.map((row, i) => (
                         <TableRow key={i} >
                           <TableCell>{i + 1}</TableCell>
                           <TableCell>
                             {row.banner_name}
                           </TableCell>
                           <TableCell>
-                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.web_image_url}`} width={50} height={40} alt={row.banner_name} className='rounded-[8px]' />
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.web_image_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
                           </TableCell>
                           <TableCell>
-                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.app_image_url}`} width={50} height={40} alt={row.banner_name} className='rounded-[8px]' />
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.app_image_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
                           </TableCell>
                           <TableCell >
                             {row.status == true ?
@@ -565,14 +784,14 @@ const resetData = () => {
                               }}
                             />
                           </TableCell>
-                          <TableCell ><FaRegTrashAlt className='cursor-pointer' onClick={() => deleteCategory(row)} /></TableCell>
-                          <TableCell><FaEdit className='cursor-pointer' onClick={() => handleEdit(row)} /></TableCell>
+                          <TableCell ><FaRegTrashAlt className='cursor-pointer' onClick={() => deleteBanner(row)} /></TableCell>
+                          {/* <TableCell><FaEdit className='cursor-pointer' onClick={() => handleEdit(row)} /></TableCell> */}
                         </TableRow>
                       ))}
                     </TableBody>
                     :
                     <TableRow>
-                      <TableCell colSpan={7} className='text-center text-[15px] font-bold'>No product found</TableCell>
+                      <TableCell colSpan={7} className='text-center text-[15px] font-bold'>No Banner found</TableCell>
                     </TableRow>
                   }
                 </Table>
@@ -593,7 +812,10 @@ const resetData = () => {
 
         </div>
         :
-        <div className=' py-[10px] flex flex-col space-y-5'>
+        <span>Edit</span>
+      }
+      {/* edit section commented */}
+      {/* <div className=' py-[10px] flex flex-col space-y-5'>
           <div className='flex flex-col space-y-1'>
             <span className='text-[30px] text-[#101828] font-[500]'>Banners Setup</span>
             <span className='text-[#667085] font-[400] text-[16px]'>Elevate Visual Impact with Intuitive Banner Configuration in Admin Applications.</span>
@@ -719,8 +941,7 @@ const resetData = () => {
             <span className='resetButton' onClick={resetButton}>Reset</span>
             <span className='submitButton'>Submit</span>
           </div>
-        </div>
-      }
+        </div> */}
     </div>
   )
 }

@@ -536,8 +536,8 @@ const Discounts = () => {
               <span>Discount Type </span>
               <select name='discount_type' id='discount_type' onChange={handleInputChange} value={discountData.discount_type}>
                 <option>Select Coupon Type Here</option>
-                <option>Amount</option>
-                <option>Percent</option>
+                <option>amount</option>
+                <option>percent</option>
               </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>
@@ -789,8 +789,8 @@ const Discounts = () => {
                 <span>Discount Type </span>
                 <select name='discount_type' defaultValue={editData.discount_type || ''} >
                     <option value=''>Select Discount Type Here</option>
-                    <option value='Amount'>Amount</option>
-                    <option value="Percent">Percent</option>
+                    <option value='amount'>Amount</option>
+                    <option value="percent">Percent</option>
                 </select>
             </div>
             <div className='flex flex-col space-y-1 w-full'>

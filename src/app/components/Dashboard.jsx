@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LineChart1 from './LineChart';
 import PieChart1 from './PieChart';
-import { getAllCustomerData } from '../api';
+import { getAllCustomerData, getAllDealerData, getProducts } from '../api';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import axios from '../../../axios';
@@ -21,6 +21,11 @@ const ITEM_HEIGHT = 48;
 
 const Dashboard = () => {
     const router = useRouter()
+
+    if(typeof localStorage !== 'undefined' && !localStorage.getItem('kardifyAdminToken')){
+        router.push('/login');
+    }
+
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -37,7 +42,9 @@ const Dashboard = () => {
         let unmounted = false;
         if (!unmounted) {
             fetchCustomerData()
+            fetchDealerData()
             fetchAllOrderData()
+            fetchAllProducts()
         }
 
         return () => { unmounted = true };
@@ -58,6 +65,36 @@ const Dashboard = () => {
             console.error('Error fetching products:', error);
         }
     };
+
+
+    const [getDealerData, setGetDealerData] = useState([])
+    const fetchDealerData = async () => {
+        try {
+            const dealerData = await getAllDealerData();
+            if (dealerData.status === 'success') {
+                setGetDealerData(dealerData.dealers);
+            } else if (dealerData.message === 'Session expired') {
+                router.push('/login')
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    const [getAllProducts, setGetAllProducts] = useState([])
+    const fetchAllProducts = async () => {
+        try {
+            const productData = await getProducts();
+            if (productData.status === 'success') {
+                setGetAllProducts(productData.products);
+            } else if (productData.message === 'Session expired') {
+                router.push('/login')
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
 
     const [allOrdersData, setAllOrdersData] = useState([])
     const [statusColors, setStatusColors] = useState({});
@@ -216,50 +253,31 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-                {/* <div className="bg-[#fcf8ee] flex flex-col justify-between shadow-md rounded-lg overflow-hidden w-full p-[24px]">
+                <div className="bg-[#fcf8ee] flex flex-col justify-between shadow-md rounded-lg overflow-hidden w-full p-[24px]">
                     <div className='flex justify-between items-center'>
-                        <span className='text-[16px]'>Total Customers</span>
-                        <IconButton
-                            aria-label="more"
-                            id="long-button"
-                            aria-controls={open ? 'long-menu' : undefined}
-                            aria-expanded={open ? 'true' : undefined}
-                            aria-haspopup="true"
-                            onClick={handleClick}
-                        >
-                            <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                            id="long-menu"
-                            MenuListProps={{
-                                'aria-labelledby': 'long-button',
-                            }}
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleClose}
-                            PaperProps={{
-                                style: {
-                                    maxHeight: ITEM_HEIGHT * 4.5,
-                                    width: '20ch',
-                                },
-                            }}
-                        >
-                            {options.map((option) => (
-                                <MenuItem key={option} selected={option === 'Pyxis'} onClick={handleClose}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </Menu>
+                        <span className='text-[18px] font-[500]'>Total Dealers</span>
                     </div>
                     <div className="flex flex-col">
-                        <h2 className="text-xl font-semibold">2,420</h2>
-                        <div className='flex items-center text-[#667085] text-[14px] gap-[10px]'>
-                            <span className='text-[#027A48] text-[14px] font-[500]'>40% </span>
-
-                            <span>vs last month</span>
-                        </div>
+                        <h2 className="text-xl font-semibold">{getDealerData.length}</h2>
                     </div>
-                </div> */}
+                </div>
+                <div className="bg-[#fcf8ee] flex flex-col justify-between shadow-md rounded-lg overflow-hidden w-full p-[24px]">
+                    <div className='flex justify-between items-center'>
+                        <span className='text-[18px] font-[500]'>Total Products</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <h2 className="text-xl font-semibold">{getAllProducts.length}</h2>
+                    </div>
+                </div>
+                <div className="bg-[#fcf8ee] flex flex-col justify-between shadow-md rounded-lg overflow-hidden w-full p-[24px]">
+                    <div className='flex justify-between items-center'>
+                        <span className='text-[18px] font-[500]'>Total Orders</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <h2 className="text-xl font-semibold">{allOrdersData.length}</h2>
+                    </div>
+                </div>
+                
                 {/* <div className="bg-[#fcf8ee] flex flex-col justify-between shadow-md rounded-lg overflow-hidden w-full p-[24px]">
             <div className='flex justify-between items-center'>
                 <span className='text-[16px]'>Total Customers</span>

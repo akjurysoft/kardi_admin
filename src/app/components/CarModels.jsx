@@ -90,9 +90,11 @@ const CarModels = () => {
     const filteredRows = carModelsData.filter((e) =>
         e.model_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
     const startIndex = (page - 1) * rowsPerPage;
     const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
     const paginatedRows = filteredRows.slice(startIndex, endIndex);
+
 
     // ----------------------------------------------Change status section Starts-----------------------------------------------------
     const handleSwitchChange = (id) => {

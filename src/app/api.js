@@ -174,3 +174,19 @@ export const getAllBannerData = async () => {
         throw error;
     }
 };
+
+export const getAllDealerData = async () => {
+    try {
+        const response = await axios.get('/api/fetch-dealers',{
+            headers : {
+                Authorization : localStorage.getItem('kardifyAdminToken')
+            }
+        });
+        if(response.status === 200){
+            return response.data;
+        }
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        throw error;
+    }
+}

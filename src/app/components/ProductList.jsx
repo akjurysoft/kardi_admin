@@ -25,6 +25,8 @@ const ProductList = () => {
   const { openSnackbar } = useSnackbar();
   const router = useRouter()
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
@@ -475,6 +477,7 @@ const ProductList = () => {
     else if (selectedProductType === 'vehicle selection' && (!selectedBrand || !selectedModel || !startYear || !endYear)) {
       openSnackbar('please select both car brand, car model and year.', 'error');
     } else {
+      setIsLoading(true)
       const formData = new FormData();
       formData.append('product_name', getProductData.product_name)
       formData.append('product_desc', editorData)
@@ -569,7 +572,9 @@ const ProductList = () => {
           console.log(err)
           openSnackbar(err.response.data.message, 'error');
         })
-
+        .finally(() => {
+          setIsLoading(false)
+        })
     }
 
   }
@@ -1435,7 +1440,10 @@ const ProductList = () => {
 
             <div className='flex items-center gap-[30px] justify-end'>
               <span className='px-[38px] py-[10px] rounded-[8px] border border-[#D0D5DD] text-[16px] text-[#344054] font-[600] cursor-pointer' onClick={handleBack}>Back</span>
-              <span className='px-[38px] py-[10px] rounded-[8px] text-[16px] text-[#fff] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer' onClick={handleAddProduct}>Submit</span>
+              {/* <span className='px-[38px] py-[10px] rounded-[8px] text-[16px] text-[#fff] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer' onClick={handleAddProduct}>Submit</span> */}
+              <span className={`px-[38px] py-[10px] rounded-[8px] text-[16px] text-[#fff] font-[600] bg-[#CFAA4C] hover:opacity-80 cursor-pointer ${isLoading ? 'opacity-50 pointer-events-none' : ''}`} onClick={handleAddProduct} disabled={isLoading}>
+          {isLoading ? 'Submitting...' : 'Submit'}
+        </span>
             </div>
           </>
           : null}

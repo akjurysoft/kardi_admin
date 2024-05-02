@@ -453,6 +453,7 @@ const ProductList = () => {
     setSelectedCategory('')
     setSelectedSubCategory('')
     setSelectedSuperSubCategory('')
+    setSelectedProductType('')
     setSelectedBrand('')
     setSelectedModel('')
     setStartYear('')

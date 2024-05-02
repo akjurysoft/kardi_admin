@@ -4,7 +4,7 @@ import { IoSearch } from "react-icons/io5";
 import { FaRegTrashAlt, FaTimes } from "react-icons/fa";
 import { FaEdit } from "react-icons/fa";
 import Switch from '@mui/material/Switch';
-import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Pagination, TextField, Chip } from '@mui/material';
+import { TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, Pagination, TextField, Chip, collapseClasses } from '@mui/material';
 import Image from 'next/image';
 import Swal from 'sweetalert2'
 import { MdAdd } from "react-icons/md";
@@ -366,36 +366,63 @@ const ProductList = () => {
   const fileInputRef = useRef(null);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [images, setImages] = useState([]);
-
+  console.log(images)
+  console.log(uploadedImages)
+  
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };
 
+  // const handleFileChange = (e) => {
+  //   const selectedFiles = e.target.files;
+  //   const newImages = [];
+
+  //   for (let i = 0; i < selectedFiles.length; i++) {
+  //     const file = selectedFiles[i];
+  //     const reader = new FileReader();
+
+  //     reader.onload = (e) => {
+  //       newImages.push(file);
+  //       setUploadedImages((prevImages) => [...prevImages, e.target.result]);
+  //       setImages(newImages);
+  //     };
+
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
   const handleFileChange = (e) => {
     const selectedFiles = e.target.files;
-    const newImages = [];
-
+    const newImages = [...images];
+  
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
       const reader = new FileReader();
-
+  
       reader.onload = (e) => {
-        newImages.push(file);
+        newImages.push(file); 
         setUploadedImages((prevImages) => [...prevImages, e.target.result]);
-        setImages(newImages);
+        setImages(newImages); 
       };
-
+  
       reader.readAsDataURL(file);
     }
   };
 
-  const handleImageRemove = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
+  // const handleImageRemove = (index) => {
+  //   const newImages = [...images];
+  //   newImages.splice(index, 1);
+  //   setImages(newImages);
 
-    const newUploadedImages = [...uploadedImages];
-    newUploadedImages.splice(index, 1);
+  //   const newUploadedImages = [...uploadedImages];
+  //   newUploadedImages.splice(index, 1);
+  //   setUploadedImages(newUploadedImages);
+  // };
+
+  const handleImageRemove = (index) => {
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
+  
+    const newUploadedImages = uploadedImages.filter((_, i) => i !== index);
     setUploadedImages(newUploadedImages);
   };
 
@@ -529,6 +556,7 @@ const ProductList = () => {
             setIsClickedAddProduct(false)
             fetchProductData()
             reset()
+            setImages([])
             setUploadedImages([])
           } else {
             openSnackbar(res.data.message, 'error');
@@ -928,7 +956,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                             <TableCell>{startIndex + i + 1}</TableCell>
                             <TableCell>{row.car_brand.brand_name || 'N/A'}</TableCell>
                             <TableCell>
-                              <Image src={row.images[0]?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.images[0].image_url}` : '/images/logo.png'} width={70} height={50} alt={row.product_name} className='rounded-[8px]' />
+                              <Image src={row.images[0]?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.images[0].image_url}` : '/images/logo.png'} width={70} height={50} alt={row.product_name} className='rounded-[8px] h-[50px] w-[50px]' />
                             </TableCell>
                             <TableCell>{row.product_name}</TableCell>
                             <TableCell>{row.category.category_name}</TableCell>

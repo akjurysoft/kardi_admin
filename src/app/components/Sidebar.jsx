@@ -34,6 +34,7 @@ import StaticPages from './StaticPages';
 import Stories from './Stories';
 import DynamicPages from './DynamicPages';
 import ProductReview from './ProductReview';
+import ProductWithMulitpleCarBrands from './ProductWithMulitpleCarBrands';
 
 const Sidebar = () => {
 
@@ -123,6 +124,10 @@ const Sidebar = () => {
                                 <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'productlist' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('productlist')}>
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
                                     <span className='text-[15px] hover:text-[#FCF8EE]'>Product List</span>
+                                </div>
+                                <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'multipleproduct' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('multipleproduct')}>
+                                    <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
+                                    <span className='text-[15px] hover:text-[#FCF8EE]'>Multiple Products</span>
                                 </div>
                                 <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'productbrand' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('productbrand')}>
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
@@ -316,6 +321,8 @@ const Sidebar = () => {
             {activeComponent === 'dynamic' && <DynamicPages />}
 
             {activeComponent === 'review' && <ProductReview />}
+
+            {activeComponent === 'multipleproduct' && <ProductWithMulitpleCarBrands />}
         </div>
     )
 }

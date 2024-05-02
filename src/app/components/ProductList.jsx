@@ -36,13 +36,13 @@ const ProductList = () => {
     return () => { unmounted = true };
   }, [])
 
- 
+
 
 
   // ----------------------------------------------Fetch Category section Starts-----------------------------------------------------
   const [categoryData, setCategoryData] = useState([])
-  const [selectedCategory , setSelectedCategory] = useState(null)
-  
+  const [selectedCategory, setSelectedCategory] = useState(null)
+
   const fetchCategory = async () => {
     try {
       const getAllcategoryData = await getCategories();
@@ -56,32 +56,27 @@ const ProductList = () => {
 
   // ----------------------------------------------Fetch Sub Category section Starts-----------------------------------------------------
   const [subCategoryData, setSubCategoryData] = useState([])
-  const [selectedSubCategory , setSelectedSubCategory] = useState(null)
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null)
   useEffect(() => {
     setSelectedSubCategory(null)
+    setSelectedSuperSubCategory(null)
     if (document.getElementById('sub_category_id')) {
       document.getElementById('sub_category_id').value = '';
     }
     if (document.getElementById('super_sub_category_id')) {
       document.getElementById('super_sub_category_id').value = '';
     }
-    if (document.getElementById('edit_sub_category_id')) {
-      document.getElementById('edit_sub_category_id').value = '';
-    }
-    if (document.getElementById('edit_super_sub_category_id')) {
-      document.getElementById('edit_super_sub_category_id').value = '';
-    }
     if (selectedCategory) {
       fetchSubCategoryData(selectedCategory);
     }
   }, [selectedCategory]);
 
- 
+
   const fetchSubCategoryData = useCallback(
     (selectedCategory) => {
-      axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`,{
-        headers : {
-          Authorization : localStorage.getItem('kardifyAdminToken')
+      axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`, {
+        headers: {
+          Authorization: localStorage.getItem('kardifyAdminToken')
         }
       })
         .then((res) => {
@@ -106,7 +101,7 @@ const ProductList = () => {
 
   // ----------------------------------------------Fetch Super Sub Category section Starts-----------------------------------------------------
   const [superSubCategoryData, setSuperSubCategoryData] = useState([])
-  const [selectedSuperSubCategory , setSelectedSuperSubCategory] = useState(null)
+  const [selectedSuperSubCategory, setSelectedSuperSubCategory] = useState(null)
   useEffect(() => {
     setSelectedSuperSubCategory(null)
     if (document.getElementById('super_sub_category_id')) {
@@ -121,9 +116,9 @@ const ProductList = () => {
   }, [selectedSubCategory]);
   const fetchSuperSubCategoryData = useCallback(
     (selectedSubCategory) => {
-      axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`,{
-        headers : {
-          Authorization : localStorage.getItem('kardifyAdminToken')
+      axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`, {
+        headers: {
+          Authorization: localStorage.getItem('kardifyAdminToken')
         }
       })
         .then((res) => {
@@ -303,7 +298,7 @@ const ProductList = () => {
         .then((res) => {
           if (res.data.status === 'success') {
             setProductData(res.data.products)
-          }else if(res.data.message === 'Session expired'){
+          } else if (res.data.message === 'Session expired') {
             openSnackbar(res.data.message, 'error');
             router.push('/login')
           }
@@ -327,6 +322,7 @@ const ProductList = () => {
     sub_category_id: '',
     super_sub_category_id: '',
     minimum_order: '',
+    weight: '',
     default_price: '',
     stock: '',
     discount_type: '',
@@ -346,9 +342,9 @@ const ProductList = () => {
   })
 
   const [editorData, setEditorData] = useState('');
-    const handleEditorChange = (data) => {
-        setEditorData(data);
-    };
+  const handleEditorChange = (data) => {
+    setEditorData(data);
+  };
 
   const getData = (e) => {
     const { value, name } = e.target;
@@ -366,9 +362,7 @@ const ProductList = () => {
   const fileInputRef = useRef(null);
   const [uploadedImages, setUploadedImages] = useState([]);
   const [images, setImages] = useState([]);
-  console.log(images)
-  console.log(uploadedImages)
-  
+
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };
@@ -393,17 +387,17 @@ const ProductList = () => {
   const handleFileChange = (e) => {
     const selectedFiles = e.target.files;
     const newImages = [...images];
-  
+
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
       const reader = new FileReader();
-  
+
       reader.onload = (e) => {
-        newImages.push(file); 
+        newImages.push(file);
         setUploadedImages((prevImages) => [...prevImages, e.target.result]);
-        setImages(newImages); 
+        setImages(newImages);
       };
-  
+
       reader.readAsDataURL(file);
     }
   };
@@ -421,52 +415,57 @@ const ProductList = () => {
   const handleImageRemove = (index) => {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
-  
+
     const newUploadedImages = uploadedImages.filter((_, i) => i !== index);
     setUploadedImages(newUploadedImages);
   };
 
 
   const reset = () => {
-     setGetProductData({
-       product_name: '',
-       product_desc: '',
-       product_brand_id: '',
-       category_id: '',
-       sub_category_id: '',
-       super_sub_category_id: '',
-       minimum_order: '',
-       default_price: '',
-       stock: '',
-       discount_type: '',
-       discount: '',
-       tax_type: '',
-       tax_rate: '',
-       product_type: '',
-       car_brand_id: '',
-       car_model_id: '',
-       has_exchange_policy: '',
-       exchange_policy: '',
-       has_cancellaton_policy: '',
-       cancellation_policy: '',
-       quantity: '',
-       has_warranty: '',
-       warranty: ''
-     })
-     setSelectedCategory('')
-     setSelectedSubCategory('')
-     setSelectedSuperSubCategory('')
-     setSelectedBrand('')
-     setSelectedModel('')
-     setStartYear('')
-     setEndYear('')
-     setData({});
-     setSelectedProductAttribute([]);
-     setSelectedAttribute([]);
+    setGetProductData({
+      product_name: '',
+      product_desc: '',
+      product_brand_id: '',
+      category_id: '',
+      sub_category_id: '',
+      super_sub_category_id: '',
+      minimum_order: '',
+      weight: '',
+      default_price: '',
+      stock: '',
+      discount_type: '',
+      discount: '',
+      tax_type: '',
+      tax_rate: '',
+      product_type: '',
+      car_brand_id: '',
+      car_model_id: '',
+      has_exchange_policy: '',
+      exchange_policy: '',
+      has_cancellaton_policy: '',
+      cancellation_policy: '',
+      quantity: '',
+      has_warranty: '',
+      warranty: ''
+    })
+    setSelectedCategory('')
+    setSelectedSubCategory('')
+    setSelectedSuperSubCategory('')
+    setSelectedBrand('')
+    setSelectedModel('')
+    setStartYear('')
+    setEndYear('')
+    setData({});
+    setSelectedProductAttribute([]);
+    setSelectedAttribute([]);
   }
 
   const handleAddProduct = () => {
-    if(images.length === 0){
+    if (getProductData.weight === '' || getProductData.weight === null) {
+      openSnackbar('Enter Weight', 'error');
+    }
+
+    if (images.length === 0) {
       openSnackbar('Please add atleast one image', 'error');
       return
     }
@@ -478,58 +477,59 @@ const ProductList = () => {
     } else {
       const formData = new FormData();
       formData.append('product_name', getProductData.product_name)
-        formData.append('product_desc', editorData)
-        if(getProductData.product_brand_id){
-          formData.append('product_brand_id', getProductData.product_brand_id)
-        }
-        formData.append('category_id', selectedCategory)
-        if(selectedSubCategory){
-          formData.append('sub_category_id', selectedSubCategory)
-        }
-        if(selectedSuperSubCategory){
-          formData.append('super_sub_category_id', selectedSuperSubCategory)
-        }
-        if(getProductData.minimum_order){
-          formData.append('minimum_order', getProductData.minimum_order)
-        }
-        formData.append('default_price', getProductData.default_price)
-        formData.append('stock', getProductData.stock)
-        formData.append('product_type', selectedProductType)
-        
-        if(getProductData.discount_type && getProductData.discount){
-          formData.append('discount_type', getProductData.discount_type)
-          formData.append('discount', getProductData.discount)
-        }
+      formData.append('product_desc', editorData)
+      if (getProductData.product_brand_id) {
+        formData.append('product_brand_id', getProductData.product_brand_id)
+      }
+      formData.append('category_id', selectedCategory)
+      if (selectedSubCategory) {
+        formData.append('sub_category_id', selectedSubCategory)
+      }
+      if (selectedSuperSubCategory) {
+        formData.append('super_sub_category_id', selectedSuperSubCategory)
+      }
+      formData.append('weight', getProductData.weight)
+      if (getProductData.minimum_order) {
+        formData.append('minimum_order', getProductData.minimum_order)
+      }
+      formData.append('default_price', getProductData.default_price)
+      formData.append('stock', getProductData.stock)
+      formData.append('product_type', selectedProductType)
 
-        if(getProductData.tax_type && getProductData.tax_rate){
-          formData.append('tax_type', getProductData.tax_type)
-          formData.append('tax_rate', getProductData.tax_rate)
-        }
+      if (getProductData.discount_type && getProductData.discount) {
+        formData.append('discount_type', getProductData.discount_type)
+        formData.append('discount', getProductData.discount)
+      }
 
-        if(getProductData.quantity){
-          formData.append('quantity', getProductData.quantity)
-        }
+      if (getProductData.tax_type && getProductData.tax_rate) {
+        formData.append('tax_type', getProductData.tax_type)
+        formData.append('tax_rate', getProductData.tax_rate)
+      }
 
-        if(getProductData.exchange_policy){
-          formData.append('exchange_policy', getProductData.exchange_policy)
-        }
+      if (getProductData.quantity) {
+        formData.append('quantity', getProductData.quantity)
+      }
 
-        if(getProductData.cancellation_policy){
-          formData.append('cancellation_policy', getProductData.cancellation_policy)
-        }
+      if (getProductData.exchange_policy) {
+        formData.append('exchange_policy', getProductData.exchange_policy)
+      }
 
-        if(getProductData.warranty){
-          formData.append('warranty', getProductData.warranty)
-        }
+      if (getProductData.cancellation_policy) {
+        formData.append('cancellation_policy', getProductData.cancellation_policy)
+      }
 
-        formData.append('image_count', uploadedImages.length);
+      if (getProductData.warranty) {
+        formData.append('warranty', getProductData.warranty)
+      }
 
-        if(selectedBrand && selectedModel && startYear && endYear){
-          formData.append('car_brand_id', selectedBrand)         
-          formData.append('car_model_id', selectedModel)
-          formData.append('start_year', startYear)
-          formData.append('end_year', endYear)
-        };
+      formData.append('image_count', uploadedImages.length);
+
+      if (selectedBrand && selectedModel && startYear && endYear) {
+        formData.append('car_brand_id', selectedBrand)
+        formData.append('car_model_id', selectedModel)
+        formData.append('start_year', startYear)
+        formData.append('end_year', endYear)
+      };
 
 
       const combinationsDataString = JSON.stringify(addedAttributeData);
@@ -560,6 +560,9 @@ const ProductList = () => {
             setUploadedImages([])
           } else {
             openSnackbar(res.data.message, 'error');
+            if (res.data.message === 'Session expired.') {
+              router.push('/login')
+            }
           }
         })
         .catch(err => {
@@ -612,11 +615,11 @@ const ProductList = () => {
     e.category.category_name.toLowerCase().includes(searchQueryCategory.toLowerCase()) &&
     (!searchQuerySubCategory || (e.sub_category && e.sub_category.sub_category_name?.toLowerCase().includes(searchQuerySubCategory.toLowerCase()))) &&
     (!searchQuerySuperSubCategory || (e.super_sub_category && e.super_sub_category.super_sub_category_name?.toLowerCase().includes(searchQuerySuperSubCategory.toLowerCase())))
-);
+  );
 
-const startIndex = (page - 1) * rowsPerPage;
-const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
-const paginatedRows = filteredRows.slice(startIndex, endIndex);
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+  const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
   const handleExportToExcel = () => {
     Swal.fire({
@@ -643,7 +646,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
     });
   };
 
-  
+
 
   // ----------------------------------------------Change status section Starts-----------------------------------------------------
   const handleSwitchChange = (id) => {
@@ -938,13 +941,13 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                       <TableRow className='!bg-[#F9FAFB]'>
                         {/* Define your table header columns */}
                         <TableCell style={{ minWidth: 100 }}>Sl No</TableCell>
-                        <TableCell style={{ minWidth: 200 }}>Car Brand</TableCell>
+                        <TableCell style={{ minWidth: 150 }}>Car Brand</TableCell>
                         <TableCell style={{ minWidth: 150 }}>Product Image</TableCell>
                         <TableCell style={{ minWidth: 300 }}>Product Name</TableCell>
-                        <TableCell style={{ minWidth: 300 }}>Category Name</TableCell>
-                        <TableCell style={{ minWidth: 150 }}>Stock</TableCell>
-                        <TableCell style={{ minWidth: 150 }}>Status</TableCell>
-                        <TableCell style={{ minWidth: 150 }}>Change Status</TableCell>
+                        <TableCell style={{ minWidth: 150 }}>Category Name</TableCell>
+                        <TableCell style={{ minWidth: 50 }}>Stock</TableCell>
+                        <TableCell style={{ minWidth: 100 }}>Status</TableCell>
+                        <TableCell style={{ minWidth: 100 }} align='center'>Change Status</TableCell>
                         <TableCell style={{ minWidth: 50 }}>Delete</TableCell>
                         <TableCell style={{ minWidth: 50 }}>Edit</TableCell>
                       </TableRow>
@@ -961,7 +964,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                             <TableCell>{row.product_name}</TableCell>
                             <TableCell>{row.category.category_name}</TableCell>
                             <TableCell>{row.stock}</TableCell>
-                            <TableCell >
+                            <TableCell align='center'>
                               {row.status === 1 ?
                                 <div className='flex items-center gap-[5px] py-[5px] bg-[#ECFDF3] rounded-[16px] justify-center'>
                                   <Image src="/images/active.svg" height={10} width={10} alt='active' />
@@ -1036,7 +1039,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
                   {/* <textarea className='outline-none focus-none inputText !text-[14px] h-[120px]' placeholder='Add product description' name='product_desc' onChange={getData} /> */}
-                  <CustomEditor  name='product_desc' onChange={handleEditorChange}/>
+                  <CustomEditor name='product_desc' onChange={handleEditorChange} />
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'> Product Brand Name</span>
@@ -1052,7 +1055,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 <span className='text-[18px] font-[600]'>Category</span>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Main Category</span>
-                  <select className='!text-[14px]' name='category_id' onChange={e => setSelectedCategory(e.target.value)}>
+                  <select className='!text-[14px]' id='category_id' name='category_id' onChange={e => setSelectedCategory(e.target.value)}>
                     <option value="0">Choose Category</option>
                     {categoryData && categoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.category_name}</option>
@@ -1061,7 +1064,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Sub Category</span>
-                  <select className='!text-[14px]' name='sub_category_id' onChange={e => setSelectedSubCategory(e.target.value)}>
+                  <select className='!text-[14px]' id='sub_category_id' name='sub_category_id' onChange={e => setSelectedSubCategory(e.target.value)}>
                     <option>Choose Sub Category</option>
                     {subCategoryData && subCategoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.sub_category_name}</option>
@@ -1070,7 +1073,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 </div>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Select Super Sub Category</span>
-                  <select className='!text-[14px]' name='super_sub_category_id' onChange={e => setSelectedSuperSubCategory(e.target.value)}>
+                  <select className='!text-[14px]' id='super_sub_category_id' name='super_sub_category_id' onChange={e => setSelectedSuperSubCategory(e.target.value)}>
                     <option>Choose Super Sub Category</option>
                     {superSubCategoryData && superSubCategoryData.filter(e => e.status).map((e, i) =>
                       <option key={i} value={e.id}>{e.super_sub_category_name}</option>
@@ -1080,6 +1083,10 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Maximum Order Quantity</span>
                   <input type='text' className='outline-none focus-none inputText !text-[14px]' placeholder='Ex: 05' name='minimum_order' onChange={getData} />
+                </div>
+                <div className='flex flex-col space-y-1'>
+                  <span className='text-[14px] text-[#344054] font-[500]'>Product Weight  <span className='text-red-500 font-[400] text-[12px]'>(1.5kg = 1.5 & 1kg = 1 & 500gm = 0.5)</span> in this format</span>
+                  <input type='text' className='outline-none focus-none inputText !text-[14px]' placeholder='Ex: 05' name='weight' onChange={getData} />
                 </div>
               </div>
             </div>
@@ -1228,7 +1235,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 <span className='text-[18px] font-[600]'>Exchange Policy</span>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
-                  <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' name='exchange_policy' placeholder='Add description' onChange={getData}/>
+                  <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' name='exchange_policy' placeholder='Add description' onChange={getData} />
                 </div>
                 {/* <div className='flex items-center gap-[20px] justify-between'>
                   <span className='px-[18px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
@@ -1244,10 +1251,10 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                   <span className='text-[14px] text-[#344054] font-[500]'>Net Quantity</span>
                   <input type='text' className='outline-none focus-none inputText !text-[14px]' placeholder='06' name='quantity' onChange={getData} />
                 </div>
-                  <div className='flex flex-col space-y-1'>
-                    <span className='text-[14px] text-[#344054] font-[500]'>Warranty</span>
-                    <input type='text' className='outline-none focus-none inputText !text-[14px]' name='warranty' placeholder='06' onChange={getData}/>
-                  </div>
+                <div className='flex flex-col space-y-1'>
+                  <span className='text-[14px] text-[#344054] font-[500]'>Warranty</span>
+                  <input type='text' className='outline-none focus-none inputText !text-[14px]' name='warranty' placeholder='06' onChange={getData} />
+                </div>
                 <div className='flex items-end gap-[10px]'>
                   {/* <div className='flex items-center gap-[20px] justify-between w-full'>
                     <span className='px-[10px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
@@ -1259,7 +1266,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
                 <span className='text-[18px] font-[600]'>Cancellation Policy</span>
                 <div className='flex flex-col space-y-1'>
                   <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
-                  <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' name='cancellation_policy' placeholder='Add description' onChange={getData}/>
+                  <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' name='cancellation_policy' placeholder='Add description' onChange={getData} />
                 </div>
                 {/* <div className='flex items-center gap-[20px] justify-between'>
                   <span className='px-[18px] py-[10px] rounded-[8px] border border-[#D0D5DD] w-full text-center text-[16px] font-[600] bg-[#fff] cursor-pointer'>No</span>
@@ -1435,7 +1442,7 @@ const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
 
         {isEditable && (
-          <ProductEdit editData={editData} setEditData={setEditData} setIsEditable={setIsEditable} productBrandData={productBrandData} categoryData={categoryData} subCategoryData={subCategoryData} superSubCategoryData={superSubCategoryData} getAllProductAttribute={getAllProductAttribute}/>
+          <ProductEdit editData={editData} setEditData={setEditData} setIsEditable={setIsEditable} productBrandData={productBrandData} categoryData={categoryData} subCategoryData={subCategoryData} superSubCategoryData={superSubCategoryData} getAllProductAttribute={getAllProductAttribute} />
         )}
       </div>
     </>

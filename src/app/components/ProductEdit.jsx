@@ -169,60 +169,60 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
         formData.append('product_desc', editEditorData ? editEditorData : editData.product_desc)
         formData.append('product_brand_id', getEditProductData.product_brand_id ? getEditProductData.product_brand_id : editData.product_brand_id)
         formData.append('category_id', selectedCategory ? selectedCategory : editData.category_id)
-        if(selectedSubCategory) {
+        if (selectedSubCategory) {
             formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory : editData.sub_category_id)
         }
-        if(selectedSuperSubCategory) {
+        if (selectedSuperSubCategory) {
             formData.append('super_sub_category_id', selectedSuperSubCategory ? selectedSuperSubCategory : editData.super_sub_category_id)
         }
-        if(getEditProductData.minimum_order){
+        if (getEditProductData.minimum_order) {
             formData.append('minimum_order', getEditProductData.minimum_order ? getEditProductData.minimum_order : editData.minimum_order)
         }
         formData.append('default_price', getEditProductData.default_price ? getEditProductData.default_price : editData.default_price)
         formData.append('stock', getEditProductData.stock ? getEditProductData.stock : editData.stock)
 
-        if(getEditProductData.discount_type && getEditProductData.discount){ 
+        if (getEditProductData.discount_type && getEditProductData.discount) {
             formData.append('discount_type', getEditProductData.discount_type ? getEditProductData.discount_type : editData.discount_type)
             formData.append('discount', getEditProductData.discount ? getEditProductData.discount : editData.discount)
         }
 
-        if(getEditProductData.tax_type && getEditProductData.tax_rate){
+        if (getEditProductData.tax_type && getEditProductData.tax_rate) {
             formData.append('tax_type', getEditProductData.tax_type ? getEditProductData.tax_type : editData.tax_type)
             formData.append('tax_rate', getEditProductData.tax_rate ? getEditProductData.tax_rate : editData.tax_rate)
         }
         formData.append('product_type', getEditProductData.product_type ? getEditProductData.product_type : editData.product_type)
-        if(getEditProductData.car_brand_id && getEditProductData.car_model_id){
+        if (getEditProductData.car_brand_id && getEditProductData.car_model_id) {
             formData.append('car_brand_id', getEditProductData.car_brand_id ? getEditProductData.car_brand_id : editData.car_brand_id)
             formData.append('car_model_id', getEditProductData.car_model_id ? getEditProductData.car_model_id : editData.car_model_id)
         }
 
         formData.append('exchange_policy', getEditProductData.exchange_policy ? getEditProductData.exchange_policy : editData.exchange_policy)
         formData.append('cancellation_policy', getEditProductData.cancellation_policy ? getEditProductData.cancellation_policy : editData.cancellation_policy)
-        if(getEditProductData.quantity){
+        if (getEditProductData.quantity) {
             formData.append('quantity', getEditProductData.quantity ? getEditProductData.quantity : editData.quantity)
         }
         formData.append('warranty', getEditProductData.warranty ? getEditProductData.warranty : editData.warranty)
 
 
-        axios.post('/api/edit-product',formData,{
+        axios.post('/api/edit-product', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 Authorization: localStorage.getItem('kardifyAdminToken')
             }
         })
-        .then(res => {
-            console.log(res)
-            if(res.data.status === 'success'){
-                openSnackbar(res.data.message, 'success');
-                setIsEditable(false)
-                fetchProductData()
-            } else {
-                openSnackbar(res.data.message, 'error');
-            }
-        })
-        .catch(err => {
-            console.log(err)
-        })
+            .then(res => {
+                console.log(res)
+                if (res.data.status === 'success') {
+                    openSnackbar(res.data.message, 'success');
+                    setIsEditable(false)
+                    fetchProductData()
+                } else {
+                    openSnackbar(res.data.message, 'error');
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
     }
 
 
@@ -288,6 +288,14 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
                                 <option key={i} value={e.id}>{e.super_sub_category_name}</option>
                             )}
                         </select>
+                    </div>
+                    <div className='flex flex-col space-y-1'>
+                        <span className='text-[14px] text-[#344054] font-[500]'>Maximum Order Quantity</span>
+                        <input type='text' className='outline-none focus-none inputText !text-[14px]' defaultValue={editData.minimum_order} placeholder='Ex: 05' name='edit_minimum_order' onChange={getData} />
+                    </div>
+                    <div className='flex flex-col space-y-1'>
+                        <span className='text-[14px] text-[#344054] font-[500]'>Product Weight  <span className='text-red-500 font-[400] text-[12px]'>(1.5kg = 1.5 & 1kg = 1 & 500gm = 0.5)</span> in this format</span>
+                        <input type='text' className='outline-none focus-none inputText !text-[14px]' defaultValue={editData.weight} placeholder='Ex: 05' name='edit_weight' onChange={getData} />
                     </div>
                 </div>
             </div>
@@ -448,7 +456,7 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
                     <span className='text-[18px] font-[600]'>Exchange Policy</span>
                     <div className='flex flex-col space-y-1'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
-                        <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' defaultValue={editData.exchange_policy} placeholder='Add description' onChange={getData}/>
+                        <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' defaultValue={editData.exchange_policy} placeholder='Add description' onChange={getData} />
                     </div>
                 </div>
             </div>
@@ -462,14 +470,14 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
                     </div>
                     <div className='flex flex-col space-y-1'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Warranty</span>
-                        <input type='text' className='outline-none focus-none inputText !text-[14px]' defaultValue={editData.warranty} placeholder='06' onChange={getData}/>
+                        <input type='text' className='outline-none focus-none inputText !text-[14px]' defaultValue={editData.warranty} placeholder='06' onChange={getData} />
                     </div>
                 </div>
                 <div className='flex flex-col space-y-3 border border-[#D0D5DD] rounded-[16px] p-[16px] w-[100%]'>
                     <span className='text-[18px] font-[600]'>Cancellation Policy</span>
                     <div className='flex flex-col space-y-1'>
                         <span className='text-[14px] text-[#344054] font-[500]'>Description</span>
-                        <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' defaultValue={editData.cancellation_policy} placeholder='Add description' onChange={getData}/>
+                        <textarea className='outline-none focus-none inputText !text-[14px] h-[190px]' defaultValue={editData.cancellation_policy} placeholder='Add description' onChange={getData} />
                     </div>
                 </div>
             </div>

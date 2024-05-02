@@ -125,10 +125,10 @@ const Sidebar = () => {
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
                                     <span className='text-[15px] hover:text-[#FCF8EE]'>Product List</span>
                                 </div>
-                                <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'multipleproduct' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('multipleproduct')}>
+                                {/* <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'multipleproduct' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('multipleproduct')}>
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
                                     <span className='text-[15px] hover:text-[#FCF8EE]'>Multiple Products</span>
-                                </div>
+                                </div> */}
                                 <div className={`flex items-center hover:bg-[#cfaa4c]/60 hover:text-[#fff] rounded-[8px] gap-[20px] cursor-pointer p-[10px] ${activeComponent === 'productbrand' ? 'activeLeftMenu' : ''}`} onClick={() => handleMenuItemClick('productbrand')}>
                                     <span className='bg-black w-[7px] h-[7px] rounded-full'></span>
                                     <span className='text-[15px] hover:text-[#FCF8EE]'>Product Brands</span>
@@ -322,7 +322,7 @@ const Sidebar = () => {
 
             {activeComponent === 'review' && <ProductReview />}
 
-            {activeComponent === 'multipleproduct' && <ProductWithMulitpleCarBrands />}
+            {/* {activeComponent === 'multipleproduct' && <ProductWithMulitpleCarBrands />} */}
         </div>
     )
 }

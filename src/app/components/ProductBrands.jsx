@@ -69,7 +69,9 @@ const ProductBrands = () => {
   const filteredRows = productBrandsData.filter((e) =>
     e.brand_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const paginatedRows = filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, filteredRows.length);
+  const paginatedRows = filteredRows.slice(startIndex, endIndex);
 
   // ----------------------------------------------Change status section Starts-----------------------------------------------------
   const handleSwitchChange = (id) => {
@@ -344,9 +346,9 @@ const ProductBrands = () => {
                 </TableHead>
                 {filteredRows.length > 0 ?
                   <TableBody>
-                    {paginatedRows.map((row) => (
+                    {paginatedRows.map((row , i) => (
                       <TableRow key={row.id} >
-                        <TableCell>{row.id}</TableCell>
+                        <TableCell>{startIndex + i + 1}</TableCell>
                         <TableCell>
                           <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.image_url}`} width={50} height={40} alt={row.category_name} className='rounded-[8px]' />
                         </TableCell>

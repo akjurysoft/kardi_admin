@@ -64,7 +64,6 @@ const SuperSubCategory = () => {
     document.getElementById('image').value = ''
   }
 
-  console.log('getSuperSubCategoryName', getSuperSubCategoryName)
   // ----------------------------------------------Fetch Category section Starts-----------------------------------------------------
   const [categoryData, setCategoryData] = useState([])
 

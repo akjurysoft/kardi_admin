@@ -14,9 +14,9 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
     const [subCategoryData, setSubCategoryData] = useState([]);
     const [superSubCategoryData, setSuperSubCategoryData] = useState([]);
 
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [selectedSubCategory, setSelectedSubCategory] = useState('');
-    const [selectedSuperSubCategory, setSelectedSuperSubCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+    const [selectedSuperSubCategory, setSelectedSuperSubCategory] = useState(null);
 
     useEffect(() => {
         fetchCategory();
@@ -99,6 +99,7 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
 
     //-------------------------------------------- image section -----------------------------------------
     const [newImages, setNewImages] = useState([]);
+    console.log(newImages)
     const fileInputRef = useRef(null);
 
     const handleFileChange = (event) => {
@@ -166,11 +167,16 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
 
         formData.append('product_id', editData.id)
         formData.append('product_name', getEditProductData.product_name ? getEditProductData.product_name : editData.product_name)
-        formData.append('product_desc', editEditorData ? editEditorData : editData.product_desc)
+        if (editEditorData) {
+            formData.append('product_desc', editEditorData)
+        }
         formData.append('product_brand_id', getEditProductData.product_brand_id ? getEditProductData.product_brand_id : editData.product_brand_id)
         formData.append('category_id', selectedCategory ? selectedCategory : editData.category_id)
         if (selectedSubCategory) {
             formData.append('sub_category_id', selectedSubCategory ? selectedSubCategory : editData.sub_category_id)
+        }
+        if(newImages){
+            formData.append('images', newImages)
         }
         if (selectedSuperSubCategory) {
             formData.append('super_sub_category_id', selectedSuperSubCategory ? selectedSuperSubCategory : editData.super_sub_category_id)
@@ -399,58 +405,60 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, g
             <div className='flex items-end justify-between gap-[30px]'>
                 <div className='flex flex-col space-y-3 border border-[#D0D5DD] rounded-[16px] p-[16px] w-[100%]'>
                     <span className='text-[18px] font-[600]'>Product Brand Info</span>
-                    {/* <div className='flex flex-col space-y-1 w-full'>
-                  <span className='text-[14px] text-[#344054] font-[500]'>Product Type</span>
-                  <select className='!text-[14px] outline-none focus-none' onChange={handleProductTypeChange}>
-                    <option>Select Product Type</option>
-                    <option value='vehicle selection'>Vehicle Selection</option>
-                    <option value='general'>General</option>
-                  </select>
-                  <div className={`flex flex-col space-y-1 w-full ${showSecondDiv ? '' : 'hidden'}`}>
-                    <div className='flex items-end gap-[10px]'>
-                      <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>Car Brand</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleBrandChange}>
-                          <option value='0'>Select Brand Here</option>
-                          {brandData && brandData.map((e, i) =>
-                            <option key={i} value={e.id}>{e.brand_name}</option>
-                          )}
+                    <div className='flex flex-col space-y-1 w-full'>
+                        <span className='text-[14px] text-[#344054] font-[500]'>Product Type</span>
+                        <select className='!text-[14px] outline-none focus-none' defaultValue={editData.product_type} name='product_type' onChange={getData}>
+                            <option>Select Product Type</option>
+                            <option value='vehicle selection'>Vehicle Selection</option>
+                            <option value='general'>General</option>
                         </select>
-                      </div>
+                        {editData.product_type === 'vehicle selection' &&(
+                        <div className={`flex flex-col space-y-1 w-full`}>
+                            <div className='flex items-end gap-[10px]'>
+                                <div className='flex flex-col space-y-1 w-full'>
+                                    <span className='text-[14px] text-[#344054] font-[500]'>Car Brand</span>
+                                    <select className='!text-[14px] outline-none focus-none w-[100%]' >
+                                        <option value='0'>Select Brand Here</option>
+                                        {/* {brandData && brandData.map((e, i) =>
+                                            <option key={i} value={e.id}>{e.brand_name}</option>
+                                        )} */}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className='flex items-end gap-[10px]'>
+                                <div className='flex flex-col space-y-1 w-full'>
+                                    <span className='text-[14px] text-[#344054] font-[500]'>Car Model</span>
+                                    <select className='!text-[14px] outline-none focus-none w-[100%]' >
+                                        <option value='0'>Select Car Model Here</option>
+                                        {/* {carModels && carModels.filter(e => e.status).map((e, i) =>
+                                            <option key={i} value={e.id}>{e.model_name}</option>
+                                        )} */}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className='flex items-end gap-[10px]'>
+                                <div className='flex flex-col space-y-1 w-full'>
+                                    <span className='text-[14px] text-[#344054] font-[500]'>Start Year</span>
+                                    <select className='text-[14px]' >
+                                        <option value='0'>Choose Start Year</option>
+                                        {/* {carYears && carYears.map((e, i) =>
+                                            <option key={i} value={e}>{e}</option>
+                                        )} */}
+                                    </select>
+                                </div>
+                                <div className='flex flex-col space-y-1 w-full'>
+                                    <span className='text-[14px] text-[#344054] font-[500]'>End Year</span>
+                                    <select className='text-[14px]'>
+                                        <option value='0'>Choose End Year</option>
+                                        {/* {carYears && carYears.map((e, i) =>
+                                            <option key={i} value={e}>{e}</option>
+                                        )} */}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        )}
                     </div>
-                    <div className='flex items-end gap-[10px]'>
-                      <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>Car Model</span>
-                        <select className='!text-[14px] outline-none focus-none w-[100%]' onChange={handleModelChange}>
-                          <option value='0'>Select Car Model Here</option>
-                          {carModels && carModels.filter(e => e.status).map((e, i) =>
-                            <option key={i} value={e.id}>{e.model_name}</option>
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                    <div className='flex items-end gap-[10px]'>
-                      <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>Start Year</span>
-                        <select className='text-[14px]' value={startYear} onChange={(e) => setStartYear(e.target.value)}>
-                          <option value='0'>Choose Start Year</option>
-                          {carYears && carYears.map((e, i) =>
-                            <option key={i} value={e}>{e}</option>
-                          )}
-                        </select>
-                      </div>
-                      <div className='flex flex-col space-y-1 w-full'>
-                        <span className='text-[14px] text-[#344054] font-[500]'>End Year</span>
-                        <select className='text-[14px]' value={endYear} onChange={(e) => setEndYear(e.target.value)}>
-                          <option value='0'>Choose End Year</option>
-                          {carYears && carYears.map((e, i) =>
-                            <option key={i} value={e}>{e}</option>
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
                 </div>
                 <div className='flex flex-col space-y-3 border border-[#D0D5DD] rounded-[16px] p-[16px] w-[100%]'>
                     <span className='text-[18px] font-[600]'>Exchange Policy</span>

@@ -8,8 +8,11 @@ import { FaFileCsv } from "react-icons/fa6";
 import { FaUpload } from "react-icons/fa";
 import axios from '../../../axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useSnackbar } from '../SnackbarProvider';
 
 const BulkImport = () => {
+
+  const openSnakbar = useSnackbar()
 
   useEffect(() => {
     let unmounted = false;
@@ -74,7 +77,21 @@ const BulkImport = () => {
     setProductFields(updatedFields);
   };
 
-  const generateCSV = () => {
+  const fetchCategoryName = (categoryId) => {
+    const category = categoryData && categoryData.find(cat => cat.id === categoryId);
+    console.log(category)
+    return category ? category.category_name : '';
+  };
+  const fetchSubCategoryName = (subCategoryId) => {
+    const subCategory = getAllSubCategories.find(subCat => subCat.id === subCategoryId);
+    return subCategory ? subCategory.sub_category_name : '';
+  };
+
+  const fetchSuperSubCategoryName = (superSubCategoryId) => {
+    const superSubCategory = getAllSuperSubCategories.find(superSubCat => superSubCat.id === superSubCategoryId);
+    return superSubCategory ? superSubCategory.super_sub_category_name : '';
+  };
+  const generateCSV =async () => {
     for (const field of productFields) {
       if (!field.categoryId) {
         alert('Please select a category');
@@ -90,14 +107,19 @@ const BulkImport = () => {
       }
     }
 
-    let csv = "category_id,sub_category_id,super_sub_category_id,product_name,product_desc,default_price,stock\n";
+    let csv = "category_id,category_name,sub_category_id,sub_category_name,super_sub_category_id,super_sub_category_name,product_name,product_desc,default_price,stock,discount_type,dicount,tax_type,tax_rate,product_type,car_brand_id,car_model_id,start_year,end_year,exchange_policy,cancellation_policy,weight,warranty\n";
 
     for (const field of productFields) {
+      const categoryName =  fetchCategoryName(parseInt(field.categoryId));
+      const subCategoryName =  fetchSubCategoryName(parseInt(field.subCategoryId));
+      const superSubCategoryName =  fetchSuperSubCategoryName(parseInt(field.superSubCategoryId));
+      await Promise.all([categoryName, subCategoryName, superSubCategoryName]);
       for (let i = 0; i < parseInt(field.totalProducts); i++) {
-        csv += `${field.categoryId},${field.subCategoryId},${field.superSubCategoryId}\n`;
+        csv += `${field.categoryId},${categoryName},${field.subCategoryId},${subCategoryName},${field.superSubCategoryId},${superSubCategoryName}\n`;
       }
     }
 
+    // console.log(csv)
     downloadCSV(csv);
 
     setProductFields([{ categoryId: '', subCategoryId: '', superSubCategoryId: '', totalProducts: '' }]);
@@ -134,7 +156,7 @@ const BulkImport = () => {
   const [uploadingError, setUploadingError] = useState(false);
   const [errorTagline, setErrorTagline] = useState('');
   const [existingProductData, setExistingProductData] = useState([])
-  const [showAddButton , setShowAddButton] = useState(true)
+  const [showAddButton, setShowAddButton] = useState(true)
 
 
   const handleFileChange = (e) => {
@@ -225,8 +247,10 @@ const BulkImport = () => {
 
       await new Promise(resolve => setTimeout(resolve, 10000));
 
+      const cleanedData = parsedCsvData.map(({ category_name, sub_category_name, super_sub_category_name, ...rest }) => rest);
+
       const res = await axios.post('/api/add-bulk-product', {
-        product_data: parsedCsvData,
+        product_data: cleanedData,
       }, {
         headers: {
           Authorization: localStorage.getItem('kardifyAdminToken')
@@ -234,7 +258,7 @@ const BulkImport = () => {
       });
 
       if (res.data.status === 'success') {
-        alert(res.data.message);
+        openSnakbar(res.data.message, 'success');
         clearInterval(interval);
         setUploadingProgress(100);
         resetData()

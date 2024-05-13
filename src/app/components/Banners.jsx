@@ -140,6 +140,8 @@ const Banners = () => {
       fetchSuperSubCategoryData(selectedSubCategory);
     }
   }, [selectedSubCategory]);
+
+
   const fetchSuperSubCategoryData = useCallback(
     (selectedSubCategory) => {
       axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`,{
@@ -169,10 +171,12 @@ const Banners = () => {
 
 
   const [getAllBanners, setGetAllBanners] = useState([])
+
   const fetchBanner = async () => {
     try {
       const bannerData = await getAllBannerData();
-      setGetAllBanners(bannerData.banners);
+      console.log('banner', bannerData)
+      setGetAllBanners(bannerData);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
@@ -195,51 +199,50 @@ const Banners = () => {
     fileInputRefMobile.current.click();
   };
 
-  //   const handleFileChangeWebsite = (e) => {
-  //     const file = e.target.files[0];
-  //     const reader = new FileReader();
-
-  //     reader.onload = (e) => {
-  //       setUploadedImageWebsite(e.target.result);
-  //       setImageWeb(file)
-  //     };
-
-  //     reader.readAsDataURL(file);
-  // }
 
   const handleFileChangeWebsite = (e) => {
+
     const file = e.target.files[0];
-    if (!file) {
-      return;
-    }
-
-    const reader = new FileReader();
-
-    if (file.size > 2 * 1024 * 1024) {
-      openSnackbar("Please upload an image with size less than 2MB.", 'error');
-      e.target.value = null;
-      return;
-    }
-
-
-    reader.onload = (e) => {
-      const img = document.createElement('img');
-      img.src = e.target.result;
-
-      img.onload = () => {
-        if (img.width === 1370 && img.height === 532) {
-          setUploadedImageWebsite(e.target.result);
-          setImageWeb(file);
-        } else {
-          openSnackbar("Please upload an image with dimensions 1370 × 532 pixels.", 'error');
-          e.target.value = null;
-          setUploadedImageWebsite(null);
-          setImageWeb({});
-        }
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageWeb(file);
+        setUploadedImageWebsite(e.target.result)
       };
-    };
+      reader.readAsDataURL(file);
+    }
+    // const file = e.target.files[0];
+    // if (!file) {
+    //   return;
+    // }
 
-    reader.readAsDataURL(file);
+    // const reader = new FileReader();
+
+    // if (file.size > 2 * 1024 * 1024) {
+    //   openSnackbar("Please upload an image with size less than 2MB.", 'error');
+    //   e.target.value = null;
+    //   return;
+    // }
+
+
+    // reader.onload = (e) => {
+    //   const img = document.createElement('img');
+    //   img.src = e.target.result;
+
+    //   img.onload = () => {
+    //     if (img.width === 1370 && img.height === 532) {
+    //       setUploadedImageWebsite(e.target.result);
+    //       setImageWeb(file);
+    //     } else {
+    //       openSnackbar("Please upload an image with dimensions 1370 × 532 pixels.", 'error');
+    //       e.target.value = null;
+    //       setUploadedImageWebsite(null);
+    //       setImageWeb({});
+    //     }
+    //   };
+    // };
+
+    // reader.readAsDataURL(file);
   };
 
   const handleFileChangeMobile = (e) => {
@@ -320,6 +323,7 @@ const Banners = () => {
   // ----------------------------------------------Fetch Banner section Ends-----------------------------------------------------
 
   const [page, setPage] = useState(1);
+  //const allBannerData = [...getAllBanners]
   const rowsPerPage = 5;
   const totalRows = getAllBanners.length;
   const totalPages = Math.ceil(totalRows / rowsPerPage);
@@ -360,23 +364,23 @@ const Banners = () => {
       return;
     }
     if (itemType === 'Products') {
-      if (!imageMob.name || !imageWeb.name) {
-        openSnackbar('Choose Image for both Web And Mobile', 'error')
-        return;
-      }
+      // if (!imageMob.name || !imageWeb.name) {
+      //   openSnackbar('Choose Image for both Web And Mobile', 'error')
+      //   return;
+      // }
       const formData = new FormData();
       formData.append('banner_name', bannerDetails.banner_name);
-      formData.append('banner_type', 'product');
-      formData.append('web_image_url', imageWeb);
-      formData.append('mob_image_url', imageMob);
+      //formData.append('banner_type', 'product');
+      formData.append('banner_url', imageWeb);
+      //formData.append('mob_image_url', imageMob);
 
       const productIdsArray = selectedProducts.map(product => product.id);
       formData.append('product_ids', JSON.stringify(productIdsArray));
 
-      axios.post('/api/add-banner', formData, {
+      axios.post('/api/v1/banners', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('madhuitAdminToken')
         }
       })
         .then(res => {
@@ -547,10 +551,10 @@ const Banners = () => {
             <span className='text-[#667085] font-[400] text-[16px]'>Elevate Visual Impact with Intuitive Banner Configuration in Admin Applications.</span>
           </div>
 
-          <div className='grid grid-cols-3 gap-4 gap-[10px]'>
+          <div className='grid grid-cols-3 gap-[10px]'>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Title *</span>
-              <input type='text' placeholder='Enter Here' className='inputText' id='banner_name' name='banner_name' onChange={getData} />
+              <input type='text' placeholder='Enter Banner Name' value={bannerDetails.banner_name} className='inputText' id='banner_name' name='banner_name' onChange={getData} />
             </div>
             <div className='flex flex-col space-y-1 w-full'>
               <span>Item Type *</span>
@@ -661,7 +665,7 @@ const Banners = () => {
                 </div>
               </div>
             </div>
-            <div className='flex flex-col space-y-2  w-[100%]'>
+            {/* <div className='flex flex-col space-y-2  w-[100%]'>
               <span className='text-[18px] font-[600]'>Mobile banner</span>
               <span className='text-red-600 font-[400] text-[10px]'>Note: Only .png, .jpg, .jpeg format supported (Max. 2MB)</span>
               <div className="flex flex-col items-center justify-center text-[16px]">
@@ -699,7 +703,7 @@ const Banners = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className='flex items-center gap-[24px] justify-end'>
@@ -752,10 +756,10 @@ const Banners = () => {
                             {row.banner_name}
                           </TableCell>
                           <TableCell>
-                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.web_image_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.banner_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
                           </TableCell>
                           <TableCell>
-                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.app_image_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.banner_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
                           </TableCell>
                           <TableCell >
                             {row.status == true ?

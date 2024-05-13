@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import kingLogo from '../../../public/images/onlineKingLogo.svg'
 import logo from '../../../public/images/logo.svg'
 import dashboard from '../../../public/images/dashboard.svg'
 import category from '../../../public/images/category.svg'
 import product from '../../../public/images/product.svg'
 import banner from '../../../public/images/banner.svg'
-import { MdLogout } from "react-icons/md";
+import { MdLogin, MdLogout } from "react-icons/md";
 import { FaAngleDown } from "react-icons/fa6";
 import { FaAngleUp } from 'react-icons/fa6';
 import RightSide from './RightSide';
@@ -39,6 +40,7 @@ import ProductWithMulitpleCarBrands from './ProductWithMulitpleCarBrands';
 const Sidebar = () => {
 
     const [activeComponent, setActiveComponent] = useState('dashboard'); // Initially set to 'dashboard'
+
     const handleMenuItemClick = (component) => {
         setActiveComponent(component);
     };
@@ -48,6 +50,11 @@ const Sidebar = () => {
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [isProductOpen, setIsProductOpen] = useState(false);
     const [isCarOpen, setIsCarOpen] = useState(false);
+    const [adminLogin, setAdminLogin] = useState(true)
+
+   // let adminToken = localStorage.getItem('madhuitAdminToken');
+
+   
 
     const toggleCategoryDropdown = () => {
         setIsCategoryOpen(!isCategoryOpen);
@@ -67,8 +74,8 @@ const Sidebar = () => {
             {/*------------------------------- Lest side Menu -------------------------------------*/}
             <div className="flex flex-col w-1/4 p-4 bg-[#fcf8ee] justify-between h-full text-white">
                 <div className='flex items-center space-x-3 py-2'>
-                    <Image src={logo} width={50} height={50} />
-                    <span className='text-black font-bold'>Kardify</span>
+                    <Image src={kingLogo} width={50} height={50} alt='onlinKingLogo' />
+                    <span className='text-black font-bold'>OnlineKing</span>
                 </div>
 
                 <ul className="space-y-3 text-black h-[100%] overflow-y-scroll">
@@ -260,16 +267,38 @@ const Sidebar = () => {
 
 
                 <div className=' border-t border-slate-300'>
-                    <div className='flex space-x-3 justify-between items-center py-2'>
+                    {
+                        adminLogin ? 
+                        <div className='flex space-x-3 justify-between items-center py-2'>
                         <div className='rounded-full'>
-                            <Image src={logo} height={50} width={50} />
+                            <Image src={kingLogo} height={50} width={50} alt='kingLogo' />
                         </div>
                         <div className='flex flex-col space-y-1'>
-                            <span className='text-black '>Kardify</span>
+                            <span className='text-black '>OnlineKing</span>
                             <span className='text-slate-400'>admin@gmail.com</span>
                         </div>
-                        <MdLogout className='text-black text-[25px]' />
+                        <Link className='pl-12' href='/login'>
+                        <MdLogout  className='text-black text-[25px]' />
+
+                        </Link>
                     </div>
+                    :
+                    <div className='flex space-x-3  items-center py-2 cursor-pointer'>
+                        <div className='rounded-full'>
+                            <Image src={kingLogo} height={50} width={50} alt='kingLogo' />
+                        </div>
+                        <div className='flex flex-col space-y-1'>
+                            <span className='text-black '>Login</span>
+                            {/* <span className='text-slate-400'>admin@gmail.com</span> */}
+                        </div>
+                        <Link className='pl-12' href='/login'>
+                        <MdLogin className='text-black text-[25px]' />
+
+                        </Link>
+                    </div>
+
+                    }
+                    
                 </div>
             </div>
 

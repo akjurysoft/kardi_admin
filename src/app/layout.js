@@ -1,13 +1,13 @@
-import { Inter } from 'next/font/google'
-import './globals.css'
-import SnackbarProvider from './SnackbarProvider'
+import { Inter } from "next/font/google";
+import "./globals.css";
+import SnackbarProvider from "./SnackbarProvider";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: 'Kardify',
-  description: 'Multiple Car Accessories',
-}
+  title: "Kardify",
+  description: "Multiple Car Accessories",
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -16,5 +16,5 @@ export default function RootLayout({ children }) {
         <body className={inter.className}>{children}</body>
       </SnackbarProvider>
     </html>
-  )
+  );
 }

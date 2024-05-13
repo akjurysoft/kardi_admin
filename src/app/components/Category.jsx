@@ -51,14 +51,14 @@ const Category = () => {
 
   const fetchCategoryData = useCallback(
     () => {
-      axios.get("/api/fetch-categories", {
+      axios.get("/api/v1/categories", {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('madhuitAdminToken')
         }
       })
         .then((res) => {
           if (res.data.code == 200) {
-            setCategoryData(res.data.categories)
+            setCategoryData(res.data.data)
           } else if (res.data.status === 'error' || res.data.message === 'Session expired') {
             openSnackbar(res.data.message, 'error');
             router.push('/login')
@@ -81,7 +81,8 @@ const Category = () => {
   // ----------------------------------------------Pagination and Search Query section Starts-----------------------------------------------------
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
-  const totalRows = categoryData.length;
+  //const totalRows = 0 || categoryData.length;
+  const totalRows = categoryData ? categoryData.length : 0;
   const totalPages = Math.ceil(totalRows / rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
@@ -157,13 +158,14 @@ const Category = () => {
     // }
     const formData = new FormData();
     formData.append('category_name', getCategoryName.category_name);
+    
     if(image){
       formData.append('image', image);
     }
 
-    axios.post('/api/add-categories', formData, {
+    axios.post('/api/v1/categories', formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken'),
+        Authorization: localStorage.getItem('madhuitAdminToken'),
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -192,7 +194,7 @@ const Category = () => {
   const handleSwitchChange = (id) => {
     axios.post(`/api/update-category-status?category_id=${id}`, {}, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('madhuitAdminToken')
       }
     }).then(res => {
       if (res.data.status === 'success') {
@@ -222,7 +224,7 @@ const Category = () => {
   //   formData.append('image', image);
   //   axios.post(`/api/update-categories`, formData, {
   //     headers: {
-  //       Authorization: localStorage.getItem('kardifyAdminToken'),
+  //       Authorization: localStorage.getItem('madhuitAdminToken'),
   //       'Content-Type': 'multipart/form-data',
   //     },
   //   })
@@ -314,7 +316,7 @@ const Category = () => {
     }
     axios.post(`/api/update-categories`, formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken'),
+        Authorization: localStorage.getItem('madhuitAdminToken'),
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -355,7 +357,7 @@ const Category = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-categories?category_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('kardifyAdminToken')
+            Authorization: localStorage.getItem('madhuitAdminToken')
           }
         })
           .then(res => {

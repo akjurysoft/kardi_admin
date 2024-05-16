@@ -383,6 +383,7 @@ const CarModels = () => {
                                         <TableCell style={{ minWidth: 150 }}>Car Brand Name</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Car Model Image</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Car Model Name</TableCell>
+                                        <TableCell style={{ minWidth: 150 }}>Car Model Id</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Start Year</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>End Year</TableCell>
                                         <TableCell style={{ minWidth: 50 }}>Status</TableCell>
@@ -402,6 +403,9 @@ const CarModels = () => {
                                                 </TableCell>
                                                 <TableCell>
                                                     {row.model_name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {row.id}
                                                 </TableCell>
                                                 <TableCell>
                                                     {row.start_year}

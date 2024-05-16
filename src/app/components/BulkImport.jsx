@@ -107,7 +107,7 @@ const BulkImport = () => {
       }
     }
 
-    let csv = "category_id,category_name,sub_category_id,sub_category_name,super_sub_category_id,super_sub_category_name,product_name,product_desc,default_price,stock,discount_type,dicount,tax_type,tax_rate,product_type,car_brand_id,car_model_id,start_year,end_year,exchange_policy,cancellation_policy,weight,warranty\n";
+    let csv = "category_id,category_name,sub_category_id,sub_category_name,super_sub_category_id,super_sub_category_name,product_name,product_desc,default_price,stock,discount_type,discount,tax_type,tax_rate,product_type,car_brand_id,car_model_id,start_year,end_year,exchange_policy,cancellation_policy,weight,warranty\n";
 
     for (const field of productFields) {
       const categoryName =  fetchCategoryName(parseInt(field.categoryId));

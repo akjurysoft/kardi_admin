@@ -280,7 +280,6 @@ const BulkImport = () => {
       await new Promise(resolve => setTimeout(resolve, 10000));
 
       const cleanedData = parsedCsvData.map(({ category_name, sub_category_name, super_sub_category_name, ...rest }) => rest);
-      console.log('cleanedData', cleanedData);
 
        // Filter out empty fields from each product object
         const filteredData = cleanedData.map(product => {
@@ -293,7 +292,7 @@ const BulkImport = () => {
           return filteredProduct;
         });
 
-        console.log('filteredData', filteredData);
+    
 
     
 
@@ -322,8 +321,6 @@ const BulkImport = () => {
       }
     } catch (err) {
       console.log(err);
-      console.log('error is in the catch block');
-        console.log(err?.response?.data?.message);
         openSnackbar(err?.errponse?.data?.message, 'error');
         clearInterval(interval);
         setUploadingProgress(0);

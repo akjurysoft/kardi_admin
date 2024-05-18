@@ -182,6 +182,7 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, f
       }, []);
 
       const fetchCarYears = useCallback((modelId) => {
+        console.log('Fetching car years for model ID:', modelId);
         axios.get(`/api/fetch-car-models?id=${modelId}`)
           .then((res) => {
             if (res.data.code === 200) {
@@ -212,16 +213,29 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, f
         const {name, value} = e.target
         setBrandId(value)
 
-        setModelsId('')
+        setModelsId(null)
         setCarYears([])
-        fetchCarModelData(getEditProductData.car_brand_id)
+        
       };
 
       const handleModelChange = (e) => {
         const {name, value} = e.target
-       setModelsId(value)
-        fetchCarYears(getEditProductData.car_model_id);
+        setModelsId(value)
+        setCarYears([])
       };
+
+      useEffect(() => {
+        if (modelsId) {
+          fetchCarYears(modelsId);
+
+        }
+      }, [modelsId]);
+
+      useEffect(() => {
+        if (brandId) {
+          fetchCarModelData(brandId)
+        }
+      }, [brandId]);
 
       useEffect(() => {
         if (startYear !== '' && endYear !== '' && parseInt(endYear) < parseInt(startYear)) {
@@ -393,12 +407,12 @@ const ProductEdit = ({ editData, setEditData, setIsEditable, productBrandData, f
         console.log(getEditProductData.tax_type,getEditProductData.tax_rate,'tax-type-----')
 
         formData.append('product_type', getEditProductData.product_type ? getEditProductData.product_type : editData.product_type)
-        if (editData.car_brand_id && editData.car_model_id) {
+        
             formData.append('car_brand_id', brandId ? brandId : editData.car_brand_id)
             formData.append('car_model_id', modelsId ? modelsId : editData.car_model_id)
             formData.append('start_year', startYear ? startYear : editData.car_model_id)
             formData.append('end_year', endYear ? endYear : editData.car_model_id)
-        }
+        
 
         formData.append('exchange_policy', getEditProductData.exchange_policy ? getEditProductData.exchange_policy : editData.exchange_policy)
 

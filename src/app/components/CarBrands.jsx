@@ -330,6 +330,7 @@ const CarBrands = () => {
                                         <TableCell style={{ minWidth: 50 }}>Sl No</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Car Brand Image</TableCell>
                                         <TableCell style={{ minWidth: 150 }}>Car Brand Name</TableCell>
+                                        <TableCell style={{ minWidth: 150 }}>Car Brand Id</TableCell>
                                         <TableCell style={{ minWidth: 50 }}>Status</TableCell>
                                         <TableCell style={{ minWidth: 50 }}>Change Status</TableCell>
                                         <TableCell style={{ minWidth: 50 }}>Delete</TableCell>
@@ -346,6 +347,9 @@ const CarBrands = () => {
                                                 </TableCell>
                                                 <TableCell>
                                                     {row.brand_name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {row.id}
                                                 </TableCell>
                                                 <TableCell >
                                                     {row.status === 1 ?

@@ -64,7 +64,6 @@ const SuperSubCategory = () => {
     document.getElementById('image').value = ''
   }
 
-  console.log('getSuperSubCategoryName', getSuperSubCategoryName)
   // ----------------------------------------------Fetch Category section Starts-----------------------------------------------------
   const [categoryData, setCategoryData] = useState([])
 
@@ -679,7 +678,7 @@ const SuperSubCategory = () => {
             <div className='flex flex-col space-y-2 mb-2'>
               <span className='text-[#344054] text-[14px] font-[500]'>Choose Category</span>
               {/* <input type='text' defaultValue={editData.sub_category_name} className='inputText' placeholder='Ex: Colour' name='edit_sub_category_name' onChange={getEditData} /> */}
-              <select defaultValue={editData.category_id} name='edit_category_id' onChange={getEditData}>
+              <select defaultValue={editData.category_id} name='edit_category_id' disabled onChange={getEditData}>
                 <option>Choose Category</option>
                 {categoryData && categoryData.map((e, i) =>
                   <option key={i} value={e.id}>{e.category_name}</option>
@@ -689,7 +688,7 @@ const SuperSubCategory = () => {
 
             <div className='flex flex-col space-y-2 mb-2'>
               <span className='text-[#344054] text-[14px] font-[500]'>Choose Sub Category</span>
-              <select defaultValue={editData.sub_category_id} name='edit_sub_category_id' onChange={getEditData}>
+              <select defaultValue={editData.sub_category_id} name='edit_sub_category_id' disabled onChange={getEditData}>
                 <option>Choose Sub Category</option>
                 {subCategoryData && subCategoryData.map((e, i) =>
                   <option key={i} value={e.id}>{e.sub_category_name}</option>

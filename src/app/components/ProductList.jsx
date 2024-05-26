@@ -173,6 +173,7 @@ const ProductList = () => {
   }, [selectedBrand]);
 
   const [brandData, setBrandData] = useState([])
+
   const fetchBrandData = useCallback(
     () => {
       axios.get(`/api/fetch-car-brands`)
@@ -217,6 +218,7 @@ const ProductList = () => {
   const [carYears, setCarYears] = useState([]);
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
+
   const fetchCarYears = useCallback((modelId) => {
     axios.get(`/api/fetch-car-models?id=${modelId}`)
       .then((res) => {
@@ -1451,7 +1453,7 @@ const ProductList = () => {
 
 
         {isEditable && (
-          <ProductEdit editData={editData} setEditData={setEditData} setIsEditable={setIsEditable} productBrandData={productBrandData} categoryData={categoryData} subCategoryData={subCategoryData} superSubCategoryData={superSubCategoryData} getAllProductAttribute={getAllProductAttribute} />
+          <ProductEdit editData={editData} setEditData={setEditData} setIsEditable={setIsEditable} productBrandData={productBrandData} categoryData={categoryData} subCategoryData={subCategoryData} superSubCategoryData={superSubCategoryData} getAllProductAttribute={getAllProductAttribute} fetchProduct={fetchProductData} />
         )}
       </div>
     </>

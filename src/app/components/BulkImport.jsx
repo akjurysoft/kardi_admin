@@ -8,8 +8,14 @@ import { FaFileCsv } from "react-icons/fa6";
 import { FaUpload } from "react-icons/fa";
 import axios from '../../../axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useSnackbar } from '../SnackbarProvider';
 
 const BulkImport = () => {
+
+  const {openSnackbar} = useSnackbar()
+
+
+
 
   useEffect(() => {
     let unmounted = false;
@@ -53,6 +59,15 @@ const BulkImport = () => {
     }
   };
 
+
+
+// For selection of subcategories and supersub categories based on category
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const filteredSubCategories = getAllSubCategories.filter(subCat => subCat.category_id === parseInt(selectedCategory));
+  const filteredSuperSubCategories = getAllSuperSubCategories.filter(superSubCat => superSubCat.sub_category_id === parseInt(selectedSubCategory));
+  
+
   // -------------------------------- creating CSV Files------------------------------------------
   const [productFields, setProductFields] = useState([{ categoryId: '', subCategoryId: '', superSubCategoryId: '', totalProducts: '' }]);
 
@@ -64,6 +79,16 @@ const BulkImport = () => {
     setProductFields(prevFields => prevFields.filter((_, i) => i !== index));
   };
 
+  // const handleFieldChange = (index, fieldName, value) => {
+  //   if (value === "Choose Category") {
+  //     alert("Please select a valid category");
+  //     return;
+  //   }
+  //   const updatedFields = [...productFields];
+  //   updatedFields[index][fieldName] = value;
+  //   setProductFields(updatedFields);
+  // };
+
   const handleFieldChange = (index, fieldName, value) => {
     if (value === "Choose Category") {
       alert("Please select a valid category");
@@ -71,10 +96,33 @@ const BulkImport = () => {
     }
     const updatedFields = [...productFields];
     updatedFields[index][fieldName] = value;
+  
+    if (fieldName === 'categoryId') {
+      setSelectedCategory(value);
+      setSelectedSubCategory('');
+    } else if (fieldName === 'subCategoryId') {
+      setSelectedSubCategory(value);
+    }
+  
     setProductFields(updatedFields);
   };
+  
 
-  const generateCSV = () => {
+  const fetchCategoryName = (categoryId) => {
+    const category = categoryData && categoryData.find(cat => cat.id === categoryId);
+    console.log(category)
+    return category ? category.category_name : '';
+  };
+  const fetchSubCategoryName = (subCategoryId) => {
+    const subCategory = getAllSubCategories.find(subCat => subCat.id === subCategoryId);
+    return subCategory ? subCategory.sub_category_name : '';
+  };
+
+  const fetchSuperSubCategoryName = (superSubCategoryId) => {
+    const superSubCategory = getAllSuperSubCategories.find(superSubCat => superSubCat.id === superSubCategoryId);
+    return superSubCategory ? superSubCategory.super_sub_category_name : '';
+  };
+  const generateCSV =async () => {
     for (const field of productFields) {
       if (!field.categoryId) {
         alert('Please select a category');
@@ -90,14 +138,19 @@ const BulkImport = () => {
       }
     }
 
-    let csv = "category_id,sub_category_id,super_sub_category_id,product_name,product_desc,default_price,stock\n";
+    let csv = "category_id,category_name,sub_category_id,sub_category_name,super_sub_category_id,super_sub_category_name,product_name,product_desc,default_price,stock,discount_type,discount,tax_type,tax_rate,product_type,car_brand_id,car_model_id,start_year,end_year,exchange_policy,cancellation_policy,weight,warranty\n";
 
     for (const field of productFields) {
+      const categoryName =  fetchCategoryName(parseInt(field.categoryId));
+      const subCategoryName =  fetchSubCategoryName(parseInt(field.subCategoryId));
+      const superSubCategoryName =  fetchSuperSubCategoryName(parseInt(field.superSubCategoryId));
+      await Promise.all([categoryName, subCategoryName, superSubCategoryName]);
       for (let i = 0; i < parseInt(field.totalProducts); i++) {
-        csv += `${field.categoryId},${field.subCategoryId},${field.superSubCategoryId}\n`;
+        csv += `${field.categoryId},${categoryName},${field.subCategoryId},${subCategoryName},${field.superSubCategoryId},${superSubCategoryName}\n`;
       }
     }
 
+    // console.log(csv)
     downloadCSV(csv);
 
     setProductFields([{ categoryId: '', subCategoryId: '', superSubCategoryId: '', totalProducts: '' }]);
@@ -132,9 +185,10 @@ const BulkImport = () => {
   const [uploadingProgress, setUploadingProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
   const [uploadingError, setUploadingError] = useState(false);
+  const [existUploadError, setExistUploadError] = useState(false);
   const [errorTagline, setErrorTagline] = useState('');
   const [existingProductData, setExistingProductData] = useState([])
-  const [showAddButton , setShowAddButton] = useState(true)
+  const [showAddButton, setShowAddButton] = useState(true)
 
 
   const handleFileChange = (e) => {
@@ -225,30 +279,53 @@ const BulkImport = () => {
 
       await new Promise(resolve => setTimeout(resolve, 10000));
 
+      const cleanedData = parsedCsvData.map(({ category_name, sub_category_name, super_sub_category_name, ...rest }) => rest);
+
+       // Filter out empty fields from each product object
+        const filteredData = cleanedData.map(product => {
+          const filteredProduct = {};
+          for (const key in product) {
+            if (product[key] !== "") {
+              filteredProduct[key] = product[key];
+            }
+          }
+          return filteredProduct;
+        });
+
+    
+
+    
+
       const res = await axios.post('/api/add-bulk-product', {
-        product_data: parsedCsvData,
+        product_data: filteredData,
       }, {
         headers: {
           Authorization: localStorage.getItem('kardifyAdminToken')
         }
       });
 
+      console.log('res.data', res.data);
       if (res.data.status === 'success') {
-        alert(res.data.message);
+        openSnackbar(res.data.message, 'success');
         clearInterval(interval);
         setUploadingProgress(100);
         resetData()
       } else {
+        openSnackbar(res.data.message, 'error');
         clearInterval(interval);
         setUploadingProgress(0);
         setUploadingError(true);
+        setExistUploadError(true); 
         setExistingProductData(res.data.existingProducts)
         setErrorTagline(res.data.message);
       }
     } catch (err) {
       console.log(err);
-      clearInterval(interval);
-      setUploadingProgress(0);
+        openSnackbar(err?.errponse?.data?.message, 'error');
+        clearInterval(interval);
+        setUploadingProgress(0);
+        setUploadingError(true);
+        setErrorTagline(err?.response?.data?.message);
     }
   }
 
@@ -312,7 +389,7 @@ const BulkImport = () => {
               <span className='px-[40px] py-[10px] text-[#fff] text-[14px] bg-[#cfaa4c] hover:opacity-70 cursor-pointer rounded-[8px]' onClick={handleAddNew}>Add New</span>
             </div>
           </div>
-          {productFields.map((field, index) => (
+          {/* {productFields.map((field, index) => (
             <div key={index} className='grid grid-cols-4 gap-4 p-[10px]'>
               <div className='flex flex-col space-y-1'>
                 <span className='text-[14px] text-[#344054] font-[500]'>Select Category</span>
@@ -355,7 +432,52 @@ const BulkImport = () => {
                 )}
               </div>
             </div>
-          ))}
+          ))} */}
+          {productFields.map((field, index) => (
+  <div key={index} className='grid grid-cols-4 gap-4 p-[10px]'>
+    <div className='flex flex-col space-y-1'>
+      <span className='text-[14px] text-[#344054] font-[500]'>Select Category</span>
+      <select className='!text-[14px]' name='category_id' value={field.categoryId} onChange={(e) => handleFieldChange(index, 'categoryId', e.target.value)}>
+        <option>Choose Category</option>
+        {categoryData && categoryData.filter(e => e.status).map((e, i) =>
+          <option key={i} value={e.id}>{e.category_name}</option>
+        )}
+      </select>
+    </div>
+    <div className='flex flex-col space-y-1'>
+      <span className='text-[14px] text-[#344054] font-[500]'>Select Sub Category</span>
+      <select className='!text-[14px]' name='category_id' value={field.subCategoryId} onChange={(e) => handleFieldChange(index, 'subCategoryId', e.target.value)}>
+        <option>Choose Sub Category</option>
+        {filteredSubCategories && filteredSubCategories.filter(e => e.status).map((e, i) =>
+          <option key={i} value={e.id}>{e.sub_category_name}</option>
+        )}
+      </select>
+    </div>
+    <div className='flex flex-col space-y-1'>
+      <span className='text-[14px] text-[#344054] font-[500]'>Select Super Sub Category</span>
+      <select className='!text-[14px]' name='category_id' value={field.superSubCategoryId} onChange={(e) => handleFieldChange(index, 'superSubCategoryId', e.target.value)}>
+        <option>Choose Super Sub Category</option>
+        {filteredSuperSubCategories && filteredSuperSubCategories.filter(e => e.status).map((e, i) =>
+          <option key={i} value={e.id}>{e.super_sub_category_name}</option>
+        )}
+      </select>
+    </div>
+    <div className='flex gap-[5px] items-center'>
+      <div className='flex flex-col space-y-1'>
+        <span className='text-[14px] text-[#344054] font-[500]'>Total Products (in number)</span>
+        <input type='number' placeholder='Ex: 40' className='inputText !text-[14px] outline-[#cfaa4c] focus-[#cfaa4c]' value={field.totalProducts} onChange={(e) => handleFieldChange(index, 'totalProducts', e.target.value)} />
+      </div>
+      {index > 0 && (
+        <span className='cursor-pointer' onClick={() => handleRemove(index)}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M14.293 5.293a1 1 0 011.414 1.414L11.414 12l4.293 4.293a1 1 0 01-1.414 1.414L10 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 12 4.293 7.707a1 1 0 011.414-1.414L10 10.586l4.293-4.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        </span>
+      )}
+    </div>
+  </div>
+))}
+
 
 
           <div className='flex flex-col space-y-3 p-[16px] w-[100%]'>
@@ -430,9 +552,10 @@ const BulkImport = () => {
                 value={uploadingProgress}
                 sx={uploadingError ? { backgroundColor: 'red' } : {}}
               />
-              {uploadingError ? (
+              <span className='text-[#ff0000] text-[14px] font-[600]'>{errorTagline}</span>
+              {(uploadingError && existUploadError) ? (
                 <div className='text-center space-y-1'>
-                  <span className='text-[#ff0000] text-[14px] font-[600]'>{errorTagline}</span>
+                  
                   <TableContainer component={Paper}>
                     <Table>
                       <TableHead>

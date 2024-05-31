@@ -62,7 +62,7 @@ const SubCategory = () => {
     () => {
       axios.get("/api/fetch-categories", {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -97,7 +97,7 @@ const SubCategory = () => {
     () => {
       axios.get("/api/fetch-subcategories", {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -182,7 +182,7 @@ const SubCategory = () => {
 
     axios.post('/api/add-subcategories', formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken'),
+        Authorization: localStorage.getItem('onlineKingToken'),
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -235,7 +235,7 @@ const SubCategory = () => {
   const handleSwitchChange = (id) => {
     axios.post(`/api/update-subcategory-status?sub_category_id=${id}`, {}, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {
@@ -266,7 +266,7 @@ const SubCategory = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-subcategories?sub_category_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('kardifyAdminToken')
+            Authorization: localStorage.getItem('onlineKingToken')
           }
         })
           .then(res => {
@@ -303,7 +303,7 @@ const SubCategory = () => {
   //   formData.append('image', image);
   //   axios.post(`/api/update-subcategories`, formData, {
   //     headers: {
-  //       Authorization: localStorage.getItem('kardifyAdminToken'),
+  //       Authorization: localStorage.getItem('onlineKingToken'),
   //       'Content-Type': 'multipart/form-data',
   //     },
   //   })
@@ -401,7 +401,7 @@ const SubCategory = () => {
     }
     axios.post(`/api/update-subcategories`, formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken'),
+        Authorization: localStorage.getItem('onlineKingToken'),
         'Content-Type': 'multipart/form-data',
       },
     })

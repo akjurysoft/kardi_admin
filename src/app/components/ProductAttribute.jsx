@@ -63,7 +63,7 @@ const ProductAttribute = () => {
     () => {
       axios.get('/api/fetch-all-attributes', {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -103,7 +103,7 @@ const ProductAttribute = () => {
 
     axios.post('/api/add-attributes', formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {
@@ -128,7 +128,7 @@ const ProductAttribute = () => {
   const handleSwitchChange = (id) => {
     axios.post(`/api/update-attribute-status?attribute_id=${id}`, {}, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {
@@ -177,7 +177,7 @@ const ProductAttribute = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-attributes?attribute_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('kardifyAdminToken')
+            Authorization: localStorage.getItem('onlineKingToken')
           }
         })
           .then(res => {
@@ -227,7 +227,7 @@ const ProductAttribute = () => {
       attribute_name: getEditedAttributeName.attribute_name_edit ? getEditedAttributeName.attribute_name_edit : editData.attribute_name
     }, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {

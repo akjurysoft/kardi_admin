@@ -111,7 +111,7 @@ const Orders = () => {
         () => {
             axios.get('/api/fetch-orders-admin',{
                 headers: {
-                    Authorization: localStorage.getItem('kardifyAdminToken')
+                    Authorization: localStorage.getItem('onlineKingToken')
                 }
             })
                 .then((res) => {

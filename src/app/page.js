@@ -4,8 +4,5 @@ import Sidebar from "./components/Sidebar";
 import RightSide from "./components/RightSide";
 
 export default function Home() {
-  return (
-    <Sidebar />
-    //<div>ak</div>
-  );
+  return <Sidebar />;
 }

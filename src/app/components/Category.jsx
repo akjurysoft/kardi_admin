@@ -51,14 +51,14 @@ const Category = () => {
 
   const fetchCategoryData = useCallback(
     () => {
-      axios.get("/api/v1/categories", {
+      axios.get("/api/fetch-categories", {
         headers: {
-          Authorization: localStorage.getItem('madhuitAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
           if (res.data.code == 200) {
-            setCategoryData(res.data.data)
+            setCategoryData(res.data.categories)
           } else if (res.data.status === 'error' || res.data.message === 'Session expired') {
             openSnackbar(res.data.message, 'error');
             router.push('/login')
@@ -163,9 +163,10 @@ const Category = () => {
       formData.append('image', image);
     }
 
-    axios.post('/api/v1/categories', formData, {
+    axios.post('/api/add-categories', formData, {
+      
       headers: {
-        Authorization: localStorage.getItem('madhuitAdminToken'),
+        Authorization: localStorage.getItem('onlineKingToken'),
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -194,7 +195,7 @@ const Category = () => {
   const handleSwitchChange = (id) => {
     axios.post(`/api/update-category-status?category_id=${id}`, {}, {
       headers: {
-        Authorization: localStorage.getItem('madhuitAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     }).then(res => {
       if (res.data.status === 'success') {
@@ -224,7 +225,7 @@ const Category = () => {
   //   formData.append('image', image);
   //   axios.post(`/api/update-categories`, formData, {
   //     headers: {
-  //       Authorization: localStorage.getItem('madhuitAdminToken'),
+  //       Authorization: localStorage.getItem('onlineKingToken'),
   //       'Content-Type': 'multipart/form-data',
   //     },
   //   })
@@ -316,7 +317,7 @@ const Category = () => {
     }
     axios.post(`/api/update-categories`, formData, {
       headers: {
-        Authorization: localStorage.getItem('madhuitAdminToken'),
+        Authorization: localStorage.getItem('onlineKingToken'),
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -357,7 +358,7 @@ const Category = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-categories?category_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('madhuitAdminToken')
+            Authorization: localStorage.getItem('onlineKingToken')
           }
         })
           .then(res => {

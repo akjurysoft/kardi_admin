@@ -59,6 +59,8 @@ const ProductList = () => {
   // ----------------------------------------------Fetch Sub Category section Starts-----------------------------------------------------
   const [subCategoryData, setSubCategoryData] = useState([])
   const [selectedSubCategory, setSelectedSubCategory] = useState(null)
+
+
   useEffect(() => {
     setSelectedSubCategory(null)
     setSelectedSuperSubCategory(null)
@@ -78,7 +80,7 @@ const ProductList = () => {
     (selectedCategory) => {
       axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`, {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -102,8 +104,11 @@ const ProductList = () => {
 
 
   // ----------------------------------------------Fetch Super Sub Category section Starts-----------------------------------------------------
+
+
   const [superSubCategoryData, setSuperSubCategoryData] = useState([])
   const [selectedSuperSubCategory, setSelectedSuperSubCategory] = useState(null)
+
   useEffect(() => {
     setSelectedSuperSubCategory(null)
     if (document.getElementById('super_sub_category_id')) {
@@ -116,11 +121,13 @@ const ProductList = () => {
       fetchSuperSubCategoryData(selectedSubCategory);
     }
   }, [selectedSubCategory]);
+
+
   const fetchSuperSubCategoryData = useCallback(
     (selectedSubCategory) => {
       axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`, {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -144,6 +151,7 @@ const ProductList = () => {
 
   // ----------------------------------------------Fetch Product Brands section Starts-----------------------------------------------------
   const [productBrandData, setProductBrandData] = useState([])
+
   const fetchProductBrand = async () => {
     try {
       const getProductBrandsData = await getProductBrands();
@@ -296,7 +304,7 @@ const ProductList = () => {
     () => {
       axios.get("/api/get-products", {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -553,7 +561,7 @@ const ProductList = () => {
         data: formData,
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then(res => {
@@ -658,9 +666,9 @@ const ProductList = () => {
 
   // ----------------------------------------------Change status section Starts-----------------------------------------------------
   const handleSwitchChange = (id) => {
-    axios.post(`/api/status-change-product?product_id=${id}`, {}, {
+    axios.post(`/api/status-change-product?product_id=${id}`,{},{
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {
@@ -690,7 +698,7 @@ const ProductList = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-product?product_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('kardifyAdminToken')
+            Authorization: localStorage.getItem('onlineKingToken')
           }
         })
           .then(res => {
@@ -967,31 +975,31 @@ const ProductList = () => {
                             <TableCell>{startIndex + i + 1}</TableCell>
                             <TableCell>{row.car_brand.brand_name || 'N/A'}</TableCell>
                             <TableCell>
-                              <Image src={row.images[0]?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.images[0].image_url}` : '/images/logo.png'} width={70} height={50} alt={row.product_name} className='rounded-[8px] h-[50px] w-[50px]' />
+                              <img src={row.images[0]?.image_url ? `${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.images[0].image_url}` : '/images/logo.png'} width={70} height={50} alt={row.product_name} className='rounded-[8px] h-[50px] w-[50px]' />
                             </TableCell>
                             <TableCell>{row.product_name}</TableCell>
                             <TableCell>{row.category.category_name}</TableCell>
                             <TableCell>{row.stock}</TableCell>
                             <TableCell align='center'>
-                              {row.status === 1 ?
+                              {row.is_features === 1 ?
                                 <div className='flex items-center gap-[5px] py-[5px] bg-[#ECFDF3] rounded-[16px] justify-center'>
-                                  <Image src="/images/active.svg" height={10} width={10} alt='active' />
+                                  <img src="/images/active.svg" height={10} width={10} alt='active' />
                                   <span className='text-[#027A48] text-[12px] font-[500]'>Active</span>
                                 </div> :
                                 <div className='flex items-center gap-[5px] py-[5px] bg-red-200 rounded-[16px] justify-center'>
-                                  <Image src="/images/inactive.svg" height={10} width={10} alt='active' />
+                                  <img src="/images/inactive.svg" height={10} width={10} alt='active' />
                                   <span className='text-red-500 text-[12px] font-[500]'>Inactive</span>
                                 </div>
                               }
                             </TableCell>
                             <TableCell>
                               <Switch
-                                checked={row.status === 1}
+                                checked={row.is_features === 1}
                                 onChange={() => handleSwitchChange(row.id)}
                                 inputProps={{ 'aria-label': 'controlled' }}
                                 sx={{
                                   '& .MuiSwitch-thumb': {
-                                    backgroundColor: row.status === 1 ? '#CFAA4C' : '',
+                                    backgroundColor: row.is_features === 1 ? '#CFAA4C' : '',
                                   },
                                   '& .Mui-checked + .MuiSwitch-track': {
                                     backgroundColor: '#CFAA4C',

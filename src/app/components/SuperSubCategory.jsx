@@ -80,7 +80,7 @@ const SuperSubCategory = () => {
     () => {
       axios.get("/api/fetch-categories", {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -116,7 +116,7 @@ const SuperSubCategory = () => {
     }
     axios.get(url, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then((res) => {
@@ -154,7 +154,7 @@ const SuperSubCategory = () => {
     () => {
       axios.get("/api/fetch-supersubcategories", {
         headers: {
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -208,7 +208,7 @@ const SuperSubCategory = () => {
 
     axios.post('/api/add-supersubcategory', formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken'),
+        Authorization: localStorage.getItem('onlineKingToken'),
         'Content-Type': 'multipart/form-data',
       },
     })
@@ -254,7 +254,7 @@ const SuperSubCategory = () => {
   const handleSwitchChange = (id) => {
     axios.post(`/api/update-supersubcategory-status?super_sub_category_id=${id}`, {}, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {
@@ -285,7 +285,7 @@ const SuperSubCategory = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-supersubcategories?super_sub_category_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('kardifyAdminToken')
+            Authorization: localStorage.getItem('onlineKingToken')
           }
         })
           .then(res => {
@@ -358,7 +358,7 @@ const SuperSubCategory = () => {
   //   formData.append('image', imageEdit);
   //   axios.post(`/api/edit-super-subcategory`, formData, {
   //     headers: {
-  //       Authorization: localStorage.getItem('kardifyAdminToken'),
+  //       Authorization: localStorage.getItem('onlineKingToken'),
   //       'Content-Type': 'multipart/form-data',
   //     },
   //   })
@@ -463,7 +463,7 @@ const SuperSubCategory = () => {
     }
     axios.post(`/api/edit-super-subcategory`, formData, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken'),
+        Authorization: localStorage.getItem('onlineKingToken'),
         'Content-Type': 'multipart/form-data',
       },
     })

@@ -43,7 +43,7 @@ const Dashboard = () => {
         if (!unmounted) {
             fetchCustomerData()
             fetchDealerData()
-            fetchAllOrderData()
+            //fetchAllOrderData()
             fetchAllProducts()
         }
 

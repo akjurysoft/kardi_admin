@@ -16,17 +16,14 @@ const Page = () => {
     e.preventDefault(); // Prevent default form submission behavior
 
     try {
-      const response = await axios.post("/api/v1/admin-login", {
-        username: email,
+      const response = await axios.post("/api/login-admin", {
+        email: email,
         password: password,
       });
       console.log(response.data);
       if (response.data.status === "success") {
         openSnackbar(response.data.message, "success");
-        localStorage.setItem(
-          "madhuitAdminToken",
-          response.data.data.access_token
-        );
+        localStorage.setItem("onlineKingToken", response.data.token);
         router.push("/");
       } else {
         openSnackbar(response.data.message, "error");

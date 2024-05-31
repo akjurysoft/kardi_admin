@@ -105,7 +105,7 @@ const Banners = () => {
     (selectedCategory) => {
       axios.get(`/api/fetch-subcategories?category_id=${selectedCategory}`,{
         headers : {
-          Authorization : localStorage.getItem('kardifyAdminToken')
+          Authorization : localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -146,7 +146,7 @@ const Banners = () => {
     (selectedSubCategory) => {
       axios.get(`/api/fetch-supersubcategories?sub_category_id=${selectedSubCategory}`,{
         headers : {
-          Authorization : localStorage.getItem('kardifyAdminToken')
+          Authorization : localStorage.getItem('onlineKingToken')
         }
       })
         .then((res) => {
@@ -305,7 +305,7 @@ const Banners = () => {
   //   () => {
   //     axios.get('/api/fetch-all-attributes', {
   //       headers: {
-  //         Authorization: localStorage.getItem('kardifyAdminToken')
+  //         Authorization: localStorage.getItem('onlineKingToken')
   //       }
   //     })
   //       .then((res) => {
@@ -325,7 +325,7 @@ const Banners = () => {
   const [page, setPage] = useState(1);
   //const allBannerData = [...getAllBanners]
   const rowsPerPage = 5;
-  const totalRows = getAllBanners.length;
+  const totalRows = getAllBanners?.length;
   const totalPages = Math.ceil(totalRows / rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
@@ -334,10 +334,10 @@ const Banners = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredRows = getAllBanners.filter((e) =>
+  const filteredRows = getAllBanners?.filter((e) =>
     e.banner_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const paginatedRows = filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const paginatedRows = filteredRows?.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   // --------------------------------- Add Banner Section Starts------------------------------------
   const [bannerDetails, setBannerDetails] = useState({
@@ -364,23 +364,24 @@ const Banners = () => {
       return;
     }
     if (itemType === 'Products') {
-      // if (!imageMob.name || !imageWeb.name) {
-      //   openSnackbar('Choose Image for both Web And Mobile', 'error')
-      //   return;
-      // }
+      if (!imageMob.name || !imageWeb.name) {
+        openSnackbar('Choose Image for both Web And Mobile', 'error')
+        return;
+      }
+
       const formData = new FormData();
       formData.append('banner_name', bannerDetails.banner_name);
-      //formData.append('banner_type', 'product');
-      formData.append('banner_url', imageWeb);
-      //formData.append('mob_image_url', imageMob);
+      formData.append('banner_type', 'product');
+      formData.append('web_image_url', imageWeb);
+      formData.append('mob_image_url', imageMob);
 
       const productIdsArray = selectedProducts.map(product => product.id);
       formData.append('product_ids', JSON.stringify(productIdsArray));
 
-      axios.post('/api/v1/banners', formData, {
+      axios.post('/api/add-banner', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: localStorage.getItem('madhuitAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then(res => {
@@ -405,6 +406,10 @@ const Banners = () => {
         openSnackbar('Choose Image for both Web And Mobile', 'error')
         return;
       }
+      // if(!imageWeb.name) {
+      //   openSnackbar('choose Tmage for website', 'error')
+      //   return
+      // }
 
       if (!selectedCategory) {
         openSnackbar('Choose Category', 'error')
@@ -425,7 +430,7 @@ const Banners = () => {
       axios.post('/api/add-banner', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: localStorage.getItem('kardifyAdminToken')
+          Authorization: localStorage.getItem('onlineKingToken')
         }
       })
         .then(res => {
@@ -489,7 +494,7 @@ const Banners = () => {
       if (result.isConfirmed) {
         axios.post(`/api/delete-banner?banner_id=${data.id}`, {}, {
           headers: {
-            Authorization: localStorage.getItem('kardifyAdminToken')
+            Authorization: localStorage.getItem('onlineKingToken')
           }
         })
           .then(res => {
@@ -514,7 +519,7 @@ const Banners = () => {
   const handleSwitchChange = (id) => {
     axios.post(`/api/toggle-banner-status?banner_id=${id}`, {}, {
       headers: {
-        Authorization: localStorage.getItem('kardifyAdminToken')
+        Authorization: localStorage.getItem('onlineKingToken')
       }
     })
       .then(res => {
@@ -665,7 +670,7 @@ const Banners = () => {
                 </div>
               </div>
             </div>
-            {/* <div className='flex flex-col space-y-2  w-[100%]'>
+            <div className='flex flex-col space-y-2  w-[100%]'>
               <span className='text-[18px] font-[600]'>Mobile banner</span>
               <span className='text-red-600 font-[400] text-[10px]'>Note: Only .png, .jpg, .jpeg format supported (Max. 2MB)</span>
               <div className="flex flex-col items-center justify-center text-[16px]">
@@ -703,7 +708,7 @@ const Banners = () => {
                   )}
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>
 
           <div className='flex items-center gap-[24px] justify-end'>
@@ -716,7 +721,7 @@ const Banners = () => {
             <div className='flex items-center px-3 justify-between'>
               <div className='flex space-x-2 items-center'>
                 <span className='text-[18px] font-[500] text-[#101828]'>Banners</span>
-                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{getAllBanners.length} Banners</span>
+                <span className='px-[10px] py-[5px] bg-[#FCF8EE] rounded-[16px] text-[12px] text-[#A1853C]'>{getAllBanners?.length} Banners</span>
               </div>
               <div className='flex items-center space-x-3 inputText'>
                 <IoSearch className='text-[20px]' />
@@ -747,7 +752,7 @@ const Banners = () => {
                       {/* <TableCell style={{ minWidth: 50 }}>Edit</TableCell> */}
                     </TableRow>
                   </TableHead>
-                  {filteredRows.length > 0 ?
+                  {filteredRows?.length > 0 ?
                     <TableBody>
                       {paginatedRows.map((row, i) => (
                         <TableRow key={i} >
@@ -756,10 +761,10 @@ const Banners = () => {
                             {row.banner_name}
                           </TableCell>
                           <TableCell>
-                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.banner_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.web_image_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
                           </TableCell>
                           <TableCell>
-                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.banner_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
+                            <img src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}${row.app_image_url}`} width={60} height={60} alt={row.banner_name} className='rounded-[8px] h-[60px] w-[100px]' />
                           </TableCell>
                           <TableCell >
                             {row.status == true ?
@@ -802,7 +807,7 @@ const Banners = () => {
               </TableContainer>
             </Paper>
 
-            {filteredRows.length > rowsPerPage && (
+            {filteredRows?.length > rowsPerPage && (
               <div className='flex justify-center mt-3'>
                 <Pagination
                   count={totalPages}
